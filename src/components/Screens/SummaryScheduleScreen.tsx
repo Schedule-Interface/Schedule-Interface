@@ -300,32 +300,8 @@ export const SummaryScheduleScreen: React.FC<SummaryScheduleScreenProps> = ({
           </p>
         </div>
 
-        {/* Month Switcher Controls */}
+        {/* Action Controls */}
         <div className="flex flex-wrap items-center gap-3">
-          <div className="flex items-center bg-slate-100 dark:bg-[#1f2023] p-1 rounded-xl border border-slate-200 dark:border-slate-800 shadow-2xs">
-            <button
-              type="button"
-              onClick={handlePrevMonth}
-              className="p-1.5 rounded-lg hover:bg-white dark:hover:bg-[#2c2d33] text-slate-700 dark:text-slate-200 transition-all cursor-pointer flex items-center justify-center"
-              title="Tháng trước"
-            >
-              <span className="material-symbols-outlined text-[20px]">chevron_left</span>
-            </button>
-
-            <span className="px-3 text-xs font-bold text-slate-800 dark:text-slate-100 min-w-[110px] text-center">
-              {monthNames[selectedMonth]}, {selectedYear}
-            </span>
-
-            <button
-              type="button"
-              onClick={handleNextMonth}
-              className="p-1.5 rounded-lg hover:bg-white dark:hover:bg-[#2c2d33] text-slate-700 dark:text-slate-200 transition-all cursor-pointer flex items-center justify-center"
-              title="Tháng sau"
-            >
-              <span className="material-symbols-outlined text-[20px]">chevron_right</span>
-            </button>
-          </div>
-
           <button
             type="button"
             onClick={handleTodayMonth}
@@ -448,7 +424,7 @@ export const SummaryScheduleScreen: React.FC<SummaryScheduleScreenProps> = ({
 
       {/* Master Monthly Calendar Grid (5 Cột Mon - Fri) */}
       <div className="bg-white dark:bg-[#25262b] border border-[#E2E8F0] dark:border-[#3b3d45] rounded-2xl p-5 shadow-xs space-y-4">
-        <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 pb-3">
           <div className="flex items-center gap-2">
             <span className="material-symbols-outlined text-accent text-[22px]">
               calendar_month
@@ -456,6 +432,33 @@ export const SummaryScheduleScreen: React.FC<SummaryScheduleScreenProps> = ({
             <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">
               Lịch Tháng tổng thể - {monthNames[selectedMonth]}, {selectedYear}
             </h3>
+          </div>
+
+          {/* Month Switcher Controls */}
+          <div className="flex items-center bg-slate-100 dark:bg-[#1f2023] p-1 rounded-xl border border-slate-200 dark:border-slate-800 shadow-2xs">
+            <button
+              type="button"
+              onClick={handlePrevMonth}
+              className="p-1.5 rounded-lg hover:bg-white dark:hover:bg-[#2c2d33] text-slate-700 dark:text-slate-200 transition-all cursor-pointer flex items-center justify-center"
+              title="Tháng trước"
+              aria-label="Tháng trước"
+            >
+              <span className="material-symbols-outlined text-[18px]">chevron_left</span>
+            </button>
+
+            <span className="px-3 text-xs font-bold text-slate-800 dark:text-slate-100 min-w-[110px] text-center">
+              {monthNames[selectedMonth]}, {selectedYear}
+            </span>
+
+            <button
+              type="button"
+              onClick={handleNextMonth}
+              className="p-1.5 rounded-lg hover:bg-white dark:hover:bg-[#2c2d33] text-slate-700 dark:text-slate-200 transition-all cursor-pointer flex items-center justify-center"
+              title="Tháng sau"
+              aria-label="Tháng sau"
+            >
+              <span className="material-symbols-outlined text-[18px]">chevron_right</span>
+            </button>
           </div>
         </div>
 
