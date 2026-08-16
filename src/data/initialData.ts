@@ -34,6 +34,8 @@ export const INITIAL_ACCOUNTS: UserAccount[] = [
     shiftsCompleted: 152,
     rating: 4.8,
     skills: ["An ninh cơ bản", "Sơ cấp cứu", "Tiếng Anh giao tiếp", "Lái xe hạng B2"],
+    cvFileName: "CV_NguyenVanAn.pdf",
+    cvFileSize: "1.8 MB",
   },
   {
     id: "usr-2",
@@ -59,6 +61,8 @@ export const INITIAL_ACCOUNTS: UserAccount[] = [
     shiftsCompleted: 48,
     rating: 4.2,
     skills: ["Hỗ trợ văn phòng", "Tin học văn phòng"],
+    cvFileName: "CV_TranThiBinh_HoSo.pdf",
+    cvFileSize: "1.6 MB",
   },
   {
     id: "usr-3",
@@ -86,6 +90,10 @@ export const INITIAL_ACCOUNTS: UserAccount[] = [
     shiftsCompleted: 98,
     rating: 4.9,
     skills: ["Kỹ thuật mạng", "An ninh sự kiện", "Lái xe hạng B2"],
+    cvFileName: "CV_LeVanCuong_KyThuat.pdf",
+    cvFileSize: "2.1 MB",
+    notes:
+      "Cộng tác viên nhiệt tình, có chứng chỉ kỹ thuật máy tính và hỗ trợ trực ca sáng rất đúng giờ.",
   },
   {
     id: "usr-4",
@@ -113,6 +121,8 @@ export const INITIAL_ACCOUNTS: UserAccount[] = [
     shiftsCompleted: 210,
     rating: 5.0,
     skills: ["Quản lý nhóm", "Điều phối sự kiện", "Tiếng Anh giao tiếp"],
+    cvFileName: "CV_PhamThiDung_DieuPhoi.docx",
+    cvFileSize: "1.2 MB",
   },
 ];
 
@@ -135,6 +145,8 @@ export const INITIAL_REQUESTS: RegistrationRequest[] = [
       "https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=600&q=80",
     cccdBack:
       "https://images.unsplash.com/photo-1586281380349-632531db7ed4?auto=format&fit=crop&w=600&q=80",
+    cvFileName: "CV_NguyenVanA_KyThuat.pdf",
+    cvFileSize: "1.4 MB",
   },
   {
     id: "req-2",
@@ -154,6 +166,8 @@ export const INITIAL_REQUESTS: RegistrationRequest[] = [
       "https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=600&q=80",
     cccdBack:
       "https://images.unsplash.com/photo-1586281380349-632531db7ed4?auto=format&fit=crop&w=600&q=80",
+    cvFileName: "CV_TranThiB_HanhChinh.docx",
+    cvFileSize: "820 KB",
   },
   {
     id: "req-3",
@@ -173,6 +187,8 @@ export const INITIAL_REQUESTS: RegistrationRequest[] = [
       "https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=600&q=80",
     cccdBack:
       "https://images.unsplash.com/photo-1586281380349-632531db7ed4?auto=format&fit=crop&w=600&q=80",
+    cvFileName: "CV_DangQuocHuy_AnToan.pdf",
+    cvFileSize: "2.1 MB",
   },
   {
     id: "req-4",
@@ -190,6 +206,8 @@ export const INITIAL_REQUESTS: RegistrationRequest[] = [
       "https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=600&q=80",
     cccdBack:
       "https://images.unsplash.com/photo-1586281380349-632531db7ed4?auto=format&fit=crop&w=600&q=80",
+    cvFileName: "CV_VuThanhHa.pdf",
+    cvFileSize: "950 KB",
   },
   {
     id: "req-5",
@@ -207,6 +225,8 @@ export const INITIAL_REQUESTS: RegistrationRequest[] = [
       "https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=600&q=80",
     cccdBack:
       "https://images.unsplash.com/photo-1586281380349-632531db7ed4?auto=format&fit=crop&w=600&q=80",
+    cvFileName: "CV_NgoTanTai.docx",
+    cvFileSize: "640 KB",
   },
 ];
 

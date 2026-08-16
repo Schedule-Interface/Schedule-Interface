@@ -40,6 +40,9 @@ export interface UserAccount {
   cccd?: string;
   cccdFront?: string;
   cccdBack?: string;
+  cvFile?: string;
+  cvFileName?: string;
+  cvFileSize?: string;
   address?: string;
   cctvCode?: string;
   joinDate?: string;
@@ -47,6 +50,9 @@ export interface UserAccount {
   shiftsCompleted?: number;
   rating?: number;
   skills?: string[];
+  room?: string;
+  workRoom?: string;
+  notes?: string;
 }
 
 export interface RegistrationRequest {
@@ -63,8 +69,13 @@ export interface RegistrationRequest {
   cccd?: string;
   address?: string;
   experience?: string;
+  room?: string;
+  workRoom?: string;
   cccdFront?: string;
   cccdBack?: string;
+  cvFile?: string;
+  cvFileName?: string;
+  cvFileSize?: string;
 }
 
 export interface AssignedCTV {

@@ -248,6 +248,76 @@ export const App: React.FC = () => {
     );
   };
 
+  const handleSaveAccountNotes = (id: string, notes: string) => {
+    setAccounts((prev) =>
+      prev.map((acc) => {
+        if (acc.id === id) {
+          return { ...acc, notes };
+        }
+        return acc;
+      })
+    );
+    setSelectedAccountDetail((prev) => (prev && prev.id === id ? { ...prev, notes } : prev));
+    showToast("Đã lưu ghi chú quản trị viên thành công");
+  };
+
+  const handleEndAccountSchedule = (
+    accountId: string,
+    startDate: string,
+    endDate: string,
+    reason: string
+  ) => {
+    const targetAcc = accounts.find((a) => a.id === accountId);
+    const accName = targetAcc?.name || "CTV";
+
+    // Filter out shifts for this account that happen after endDate
+    setShifts((prevShifts) =>
+      prevShifts.map((shift) => {
+        const isAssigned = (shift.assignedCTVs || []).some(
+          (c) => c.id === accountId || c.name === accName
+        );
+        if (!isAssigned) return shift;
+
+        const shiftDate = shift.workDate;
+        if (shiftDate && shiftDate > endDate) {
+          return {
+            ...shift,
+            assignedCTVs: (shift.assignedCTVs || []).filter(
+              (c) => c.id !== accountId && c.name !== accName
+            ),
+          };
+        }
+        return shift;
+      })
+    );
+
+    // Update account note with end schedule record
+    const formattedReason = reason.trim() ? reason.trim() : "Không có lý do ghi chú";
+    const logEntry = `[Kết thúc lịch: ${startDate} - ${endDate} | Lý do: ${formattedReason}]`;
+
+    setAccounts((prev) =>
+      prev.map((acc) => {
+        if (acc.id === accountId) {
+          const newNotes = acc.notes ? `${acc.notes}\n${logEntry}` : logEntry;
+          return { ...acc, notes: newNotes };
+        }
+        return acc;
+      })
+    );
+
+    setSelectedAccountDetail((prev) => {
+      if (prev && prev.id === accountId) {
+        const newNotes = prev.notes ? `${prev.notes}\n${logEntry}` : logEntry;
+        return { ...prev, notes: newNotes };
+      }
+      return prev;
+    });
+
+    showToast(
+      `Đã kết thúc lịch làm việc của ${accName} từ ${endDate}. Các ca sau ngày này đã được hủy bỏ.`
+    );
+  };
+
   // Request Operations
   const handleApproveRequest = (id: string) => {
     const req = requests.find((r) => r.id === id);
@@ -272,7 +342,12 @@ export const App: React.FC = () => {
       shiftsCompleted: 0,
       rating: 5.0,
       dob: req.dob,
-      address: req.address
+      address: req.address,
+      cccdFront: req.cccdFront,
+      cccdBack: req.cccdBack,
+      cvFile: req.cvFile,
+      cvFileName: req.cvFileName,
+      cvFileSize: req.cvFileSize,
     };
     setAccounts((prev) => [newAcc, ...prev]);
     showToast(`Đã phê duyệt hồ sơ của ${req.name} và chuyển sang Danh sách tài khoản`);
@@ -301,7 +376,12 @@ export const App: React.FC = () => {
       shiftsCompleted: 0,
       rating: 5.0,
       dob: req.dob,
-      address: req.address
+      address: req.address,
+      cccdFront: req.cccdFront,
+      cccdBack: req.cccdBack,
+      cvFile: req.cvFile,
+      cvFileName: req.cvFileName,
+      cvFileSize: req.cvFileSize,
     };
     setAccounts((prev) => [newAcc, ...prev]);
     if (reason) {
@@ -411,10 +491,17 @@ export const App: React.FC = () => {
     return (
       <LoginScreen
         onLoginSuccess={handleLoginSuccess}
-        onRequestRegister={() => {
-          setIsLoggedIn(true);
-          setCurrentTab('requests');
-          showToast('Chuyển hướng đến màn hình đăng ký');
+        onRequestRegister={(newRequest) => {
+          setRequests((prev) => [newRequest, ...prev]);
+          const newNotif: NotificationItem = {
+            id: `notif-${Date.now()}`,
+            title: 'Yêu cầu đăng ký mới',
+            message: `${newRequest.name} vừa gửi hồ sơ ứng tuyển CTV (có đính kèm CCCD & CV).`,
+            time: 'Vừa xong',
+            type: 'info',
+            read: false,
+          };
+          setNotifications((prev) => [newNotif, ...prev]);
         }}
         onForgotPassword={() => alert('Vui lòng liên hệ Quản trị viên để đặt lại mật khẩu.')}
       />
@@ -658,6 +745,8 @@ export const App: React.FC = () => {
         shifts={shifts}
         onClose={() => setSelectedAccountDetail(null)}
         onToggleStatus={handleToggleAccountStatus}
+        onSaveNotes={handleSaveAccountNotes}
+        onEndSchedule={handleEndAccountSchedule}
       />
 
       <EditProfileModal
