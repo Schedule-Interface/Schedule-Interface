@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { UserAccount, ShiftSlot, formatPhoneNumber } from "../../types";
+import { UserAccount, ShiftSlot } from "../../types";
+import { formatPhoneNumber } from "../../utils/formatters";
 
 interface ViewAccountDetailModalProps {
   account: UserAccount | null;
@@ -46,7 +47,7 @@ export const ViewAccountDetailModal: React.FC<ViewAccountDetailModalProps> = ({
   // End Schedule Popup states
   const [isEndScheduleModalOpen, setIsEndScheduleModalOpen] = useState(false);
   const [endScheduleEndDate, setEndScheduleEndDate] = useState(
-    new Date().toISOString().split("T")[0],
+    new Date().toISOString().split("T")[0]
   );
   const [endScheduleReason, setEndScheduleReason] = useState("");
   const [endScheduleError, setEndScheduleError] = useState("");
@@ -60,7 +61,7 @@ export const ViewAccountDetailModal: React.FC<ViewAccountDetailModalProps> = ({
   const userRegisteredStartDateISO = useMemo(() => {
     if (!account) return new Date().toISOString().split("T")[0];
     const userShifts = shifts.filter((s) =>
-      (s.assignedCTVs || []).some((c) => c.id === account.id || c.name === account.name),
+      (s.assignedCTVs || []).some((c) => c.id === account.id || c.name === account.name)
     );
 
     let earliest = "";
@@ -137,7 +138,7 @@ export const ViewAccountDetailModal: React.FC<ViewAccountDetailModalProps> = ({
         account.id,
         userRegisteredStartDateFormatted,
         formatDisplayDate(endScheduleEndDate),
-        endScheduleReason,
+        endScheduleReason
       );
     }
     setIsEndScheduleModalOpen(false);
@@ -322,8 +323,8 @@ LỊCH SỬ HOẠT ĐỘNG:
         (c) =>
           c.id === account.id ||
           c.name === account.name ||
-          (c.cctvCode && c.cctvCode === account.cctvCode),
-      ),
+          (c.cctvCode && c.cctvCode === account.cctvCode)
+      )
     );
     if (userShift?.room) return userShift.room;
 
@@ -445,9 +446,6 @@ LỊCH SỬ HOẠT ĐỘNG:
                 <span className="text-[11px] font-bold text-[#1b365d] dark:text-[#d6e3ff] uppercase tracking-wider flex items-center gap-1.5">
                   <span className="material-symbols-outlined text-[16px]">badge</span>
                   <span>Ảnh chụp CCCD (Mặt trước & Mặt sau)</span>
-                </span>
-                <span className="text-[10px] text-slate-500 font-medium">
-                  Nhấn vào ảnh để xem chi tiết
                 </span>
               </div>
               <div className="grid grid-cols-2 gap-3">
@@ -769,9 +767,7 @@ LỊCH SỬ HOẠT ĐỘNG:
                 info
               </span>
               <p className="leading-relaxed text-[11px]">
-                Lịch làm việc từ <strong>ngày bắt đầu</strong> đến <strong>ngày kết thúc</strong>{" "}
-                vẫn được ghi nhận. Hệ thống sẽ <strong>tự động loại bỏ các ca đăng ký thừa</strong>{" "}
-                sau ngày kết thúc đã chọn để tránh lịch ảo.
+                Lịch làm việc từ <strong>ngày bắt đầu</strong> đến <strong>ngày kết thúc</strong> vẫn được ghi nhận. Hệ thống sẽ <strong>tự động loại bỏ các ca đăng ký thừa</strong> sau ngày kết thúc đã chọn để tránh lịch ảo.
               </p>
             </div>
 
@@ -819,7 +815,9 @@ LỊCH SỬ HOẠT ĐỘNG:
 
             {/* Lý do kết thúc (Textarea) */}
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Lý do</label>
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                Lý do
+              </label>
               <textarea
                 value={endScheduleReason}
                 onChange={(e) => {
@@ -922,9 +920,7 @@ LỊCH SỬ HOẠT ĐỘNG:
                   <h3 className="font-bold text-sm text-[#1b365d] dark:text-[#d6e3ff]">
                     {previewDoc.fileName}
                   </h3>
-                  <p className="text-[11px] text-slate-500">
-                    {previewDoc.fileSize} • Hồ sơ đính kèm của CTV
-                  </p>
+                  <p className="text-[11px] text-slate-500">{previewDoc.fileSize} • Hồ sơ đính kèm của CTV</p>
                 </div>
               </div>
               <button
@@ -945,14 +941,10 @@ LỊCH SỬ HOẠT ĐỘNG:
                       {account.name}
                     </h2>
                     <p className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 mt-0.5">
-                      Vị trí ứng tuyển: Cộng tác viên{" "}
-                      {account.cctvCode ? `(${account.cctvCode})` : ""}
+                      Vị trí ứng tuyển: Cộng tác viên {account.cctvCode ? `(${account.cctvCode})` : ""}
                     </p>
                     <p className="text-[11px] text-slate-500 mt-1">
-                      Phòng làm việc:{" "}
-                      <span className="font-semibold text-slate-700 dark:text-slate-300">
-                        {assignedWorkRoom}
-                      </span>
+                      Phòng làm việc: <span className="font-semibold text-slate-700 dark:text-slate-300">{assignedWorkRoom}</span>
                     </p>
                   </div>
                   <div className="text-right text-[11px] text-slate-500 space-y-0.5 shrink-0">
@@ -968,24 +960,10 @@ LỊCH SỬ HOẠT ĐỘNG:
                     1. Thông tin chung
                   </h4>
                   <div className="grid grid-cols-2 gap-2 text-[11px]">
-                    <p>
-                      <span className="text-slate-500">Ngày sinh:</span>{" "}
-                      <span className="font-medium">{account.dob || "Chưa cập nhật"}</span>
-                    </p>
-                    <p>
-                      <span className="text-slate-500">Giới tính:</span>{" "}
-                      <span className="font-medium">{account.gender || "Nam"}</span>
-                    </p>
-                    <p>
-                      <span className="text-slate-500">Số CCCD:</span>{" "}
-                      <span className="font-medium">{account.cccd || "Đã xác thực"}</span>
-                    </p>
-                    <p>
-                      <span className="text-slate-500">Ngày tham gia:</span>{" "}
-                      <span className="font-medium">
-                        {account.joinDate || account.registerDate || "01/12/2023"}
-                      </span>
-                    </p>
+                    <p><span className="text-slate-500">Ngày sinh:</span> <span className="font-medium">{account.dob || "Chưa cập nhật"}</span></p>
+                    <p><span className="text-slate-500">Giới tính:</span> <span className="font-medium">{account.gender || "Nam"}</span></p>
+                    <p><span className="text-slate-500">Số CCCD:</span> <span className="font-medium">{account.cccd || "Đã xác thực"}</span></p>
+                    <p><span className="text-slate-500">Ngày tham gia:</span> <span className="font-medium">{account.joinDate || account.registerDate || "01/12/2023"}</span></p>
                   </div>
                 </div>
 
@@ -995,14 +973,7 @@ LỊCH SỬ HOẠT ĐỘNG:
                     2. Kỹ năng & Chuyên môn
                   </h4>
                   <div className="flex flex-wrap gap-1.5">
-                    {(
-                      account.skills || [
-                        "Tin học văn phòng",
-                        "Giao tiếp cơ bản",
-                        "Hỗ trợ sự kiện",
-                        "Làm việc nhóm",
-                      ]
-                    ).map((skill, idx) => (
+                    {(account.skills || ["Tin học văn phòng", "Giao tiếp cơ bản", "Hỗ trợ sự kiện", "Làm việc nhóm"]).map((skill, idx) => (
                       <span
                         key={idx}
                         className="px-2 py-0.5 bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 rounded text-[10px] font-medium"
@@ -1019,16 +990,9 @@ LỊCH SỬ HOẠT ĐỘNG:
                     3. Lịch sử & Đánh giá công việc
                   </h4>
                   <div className="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg text-[11px] space-y-1">
-                    <p>
-                      • <strong>Số ca đã hoàn thành:</strong> {account.shiftsCompleted || 0} ca trực
-                    </p>
-                    <p>
-                      • <strong>Đánh giá hiệu suất:</strong> {account.rating || 5.0} / 5.0 ⭐ (Đạt
-                      chuẩn)
-                    </p>
-                    <p>
-                      • <strong>Tình trạng hồ sơ:</strong> Đã kiểm tra & phê duyệt hợp lệ
-                    </p>
+                    <p>• <strong>Số ca đã hoàn thành:</strong> {account.shiftsCompleted || 0} ca trực</p>
+                    <p>• <strong>Đánh giá hiệu suất:</strong> {account.rating || 5.0} / 5.0 ⭐ (Đạt chuẩn)</p>
+                    <p>• <strong>Tình trạng hồ sơ:</strong> Đã kiểm tra & phê duyệt hợp lệ</p>
                   </div>
                 </div>
               </div>
@@ -1037,8 +1001,7 @@ LỊCH SỬ HOẠT ĐỘNG:
             {/* Footer */}
             <div className="flex items-center justify-between pt-2 border-t border-slate-200 dark:border-slate-700">
               <span className="text-[11px] text-slate-500">
-                Tài liệu định dạng chuẩn:{" "}
-                {previewDoc.isPdf ? "Portable Document Format (.pdf)" : "Microsoft Word (.docx)"}
+                Tài liệu định dạng chuẩn: {previewDoc.isPdf ? "Portable Document Format (.pdf)" : "Microsoft Word (.docx)"}
               </span>
               <div className="flex items-center gap-2">
                 <button

@@ -98,14 +98,75 @@ export const SummaryScheduleScreen: React.FC<SummaryScheduleScreenProps> = ({
   };
 
   const getAssignedCTVs = (dayIndex: number, type: "morning" | "afternoon") => {
+    // 1. Thứ 3 (dayIndex = 1): Hôm đó không có ca nào, không có CTV nào đi làm (trên lịch sẽ không hiển thị gì)
+    if (dayIndex === 1) {
+      return [];
+    }
+
+    // 2. Thứ 6 (dayIndex = 4): Chỉ có 1 ca sáng (ca chiều không có ca nào)
+    if (dayIndex === 4 && type === "afternoon") {
+      return [];
+    }
+
     const matchedShifts = getShiftsForDayAndType(dayIndex, type);
     const rawList = matchedShifts.flatMap((s) => s.assignedCTVs || []);
-    return rawList.filter((ctv) => {
+
+    // Deduplicate and filter active CTVs
+    const uniqueMap = new Map<string, AssignedCTV>();
+    rawList.forEach((c) => {
       const acc = accounts.find(
-        (a) => a.id === ctv.id || a.name.toLowerCase() === ctv.name.toLowerCase(),
+        (a) => a.id === c.id || a.name.toLowerCase() === c.name.toLowerCase(),
       );
-      return !acc || acc.role !== "Admin";
+      if (!acc || acc.role !== "Admin") {
+        if (!uniqueMap.has(c.id)) {
+          uniqueMap.set(c.id, c);
+        }
+      }
     });
+
+    const activeList = Array.from(uniqueMap.values());
+    if (activeList.length > 0) {
+      return activeList;
+    }
+
+    // Default CTV roster for active days
+    const ctvAccounts = accounts.filter(
+      (a) => a.role === "Cộng tác viên" && a.status === "Kích hoạt",
+    );
+    if (ctvAccounts.length === 0) return [];
+
+    // Thứ 6 (dayIndex = 4) ca sáng: đúng 1 CTV
+    if (dayIndex === 4 && type === "morning") {
+      const acc = ctvAccounts[0];
+      return [
+        {
+          id: acc.id,
+          name: acc.name,
+          avatar: acc.avatar,
+          initials: acc.initials || acc.name.slice(0, 2).toUpperCase(),
+          phone: acc.phone,
+          cctvCode: acc.cctvCode,
+          status: "Đã duyệt" as const,
+        },
+      ];
+    }
+
+    // Các ngày khác (Thứ 2, Thứ 4, Thứ 5)
+    const offset = (dayIndex * 2 + (type === "morning" ? 0 : 1)) % ctvAccounts.length;
+    const selectedAccs = [
+      ctvAccounts[offset],
+      ctvAccounts[(offset + 1) % ctvAccounts.length],
+    ].filter(Boolean);
+
+    return selectedAccs.map((acc) => ({
+      id: acc.id,
+      name: acc.name,
+      avatar: acc.avatar,
+      initials: acc.initials || acc.name.slice(0, 2).toUpperCase(),
+      phone: acc.phone,
+      cctvCode: acc.cctvCode,
+      status: "Đã duyệt" as const,
+    }));
   };
 
   // Calculate Month Calendar Weeks & Days (Mon-Fri)
