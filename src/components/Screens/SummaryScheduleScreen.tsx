@@ -378,11 +378,7 @@ export const SummaryScheduleScreen: React.FC<SummaryScheduleScreenProps> = ({
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-            {todayData.list.map(({ ctv, shifts, dayName }) => {
-              const primaryShift = shifts[0];
-              const statusKey = `${dayName}_${primaryShift}_${ctv.id}`;
-              const status = ctvStatuses[statusKey] || "Đi làm";
-
+            {todayData.list.map(({ ctv, shifts }) => {
               return (
                 <div
                   key={ctv.id}
@@ -409,21 +405,6 @@ export const SummaryScheduleScreen: React.FC<SummaryScheduleScreenProps> = ({
 
                       <div className="flex items-center gap-2 mt-1 flex-wrap">
                         <span
-                          className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[11px] font-semibold whitespace-nowrap shrink-0 ${
-                            status === "Đi làm"
-                              ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300"
-                              : "bg-rose-100 text-rose-800 dark:bg-rose-950/80 dark:text-rose-300"
-                          }`}
-                        >
-                          <span
-                            className={`w-1.5 h-1.5 rounded-full shrink-0 ${
-                              status === "Đi làm" ? "bg-emerald-500" : "bg-rose-500"
-                            }`}
-                          />
-                          <span className="whitespace-nowrap">{status}</span>
-                        </span>
-
-                        <span
                           className={`inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-bold whitespace-nowrap shrink-0 ${
                             shifts.length > 1
                               ? "bg-blue-100 text-blue-800 dark:bg-blue-950/80 dark:text-blue-300"
@@ -433,7 +414,7 @@ export const SummaryScheduleScreen: React.FC<SummaryScheduleScreenProps> = ({
                           }`}
                         >
                           <span className="whitespace-nowrap">
-                            Ca: {shifts.map((s) => s.replace("Ca ", "")).join(", ")}
+                            {shifts.map((s) => s.replace("Ca ", "")).join(", ")}
                           </span>
                         </span>
                       </div>
@@ -513,56 +494,58 @@ export const SummaryScheduleScreen: React.FC<SummaryScheduleScreenProps> = ({
                         </div>
 
                         {/* Shift Action Buttons inside Day Cell */}
-                        <div className="space-y-1.5">
+                        <div className="space-y-1.5 min-h-[58px] flex flex-col justify-start">
                           {/* Ca Sáng Button */}
-                          <button
-                            type="button"
-                            onClick={() =>
-                              handleOpenShiftDetail(
-                                cell.dayName,
-                                cell.dateFormatted,
-                                "Ca Sáng",
-                                cell.dayIndex,
-                              )
-                            }
-                            className="w-full px-2.5 py-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/40 dark:hover:bg-amber-950/80 border border-amber-200/80 dark:border-amber-900/40 flex items-center justify-between text-left transition-all cursor-pointer group"
-                            title="Bấm xem danh sách CTV ca sáng"
-                          >
-                            <div className="flex items-center gap-1.5 text-[11px] font-bold text-amber-800 dark:text-amber-300">
-                              <span className="material-symbols-outlined text-[15px]">
-                                wb_sunny
+                          {morningCTVs.length > 0 && (
+                            <button
+                              type="button"
+                              onClick={() =>
+                                handleOpenShiftDetail(
+                                  cell.dayName,
+                                  cell.dateFormatted,
+                                  "Ca Sáng",
+                                  cell.dayIndex,
+                                )
+                              }
+                              className="w-full px-2.5 py-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/40 dark:hover:bg-amber-950/80 border border-amber-200/80 dark:border-amber-900/40 flex items-center justify-between text-left transition-all cursor-pointer group"
+                              title="Bấm xem danh sách CTV ca sáng"
+                            >
+                              <div className="flex items-center text-amber-800 dark:text-amber-300">
+                                <span className="material-symbols-outlined text-[16px]">
+                                  wb_sunny
+                                </span>
+                              </div>
+                              <span className="text-[10px] font-bold bg-amber-200/80 dark:bg-amber-900/70 text-amber-900 dark:text-amber-200 px-1.5 py-0.5 rounded group-hover:scale-105 transition-transform">
+                                {morningCTVs.length} CTV
                               </span>
-                              <span>Ca Sáng</span>
-                            </div>
-                            <span className="text-[10px] font-bold bg-amber-200/80 dark:bg-amber-900/70 text-amber-900 dark:text-amber-200 px-1.5 py-0.2 rounded group-hover:scale-105 transition-transform">
-                              {morningCTVs.length} CTV
-                            </span>
-                          </button>
+                            </button>
+                          )}
 
                           {/* Ca Chiều Button */}
-                          <button
-                            type="button"
-                            onClick={() =>
-                              handleOpenShiftDetail(
-                                cell.dayName,
-                                cell.dateFormatted,
-                                "Ca Chiều",
-                                cell.dayIndex,
-                              )
-                            }
-                            className="w-full px-2.5 py-1.5 rounded-lg bg-purple-50 hover:bg-purple-100 dark:bg-purple-950/40 dark:hover:bg-purple-950/80 border border-purple-200/80 dark:border-purple-900/40 flex items-center justify-between text-left transition-all cursor-pointer group"
-                            title="Bấm xem danh sách CTV ca chiều"
-                          >
-                            <div className="flex items-center gap-1.5 text-[11px] font-bold text-purple-800 dark:text-purple-300">
-                              <span className="material-symbols-outlined text-[15px]">
-                                wb_twilight
+                          {afternoonCTVs.length > 0 && (
+                            <button
+                              type="button"
+                              onClick={() =>
+                                handleOpenShiftDetail(
+                                  cell.dayName,
+                                  cell.dateFormatted,
+                                  "Ca Chiều",
+                                  cell.dayIndex,
+                                )
+                              }
+                              className="w-full px-2.5 py-1.5 rounded-lg bg-purple-50 hover:bg-purple-100 dark:bg-purple-950/40 dark:hover:bg-purple-950/80 border border-purple-200/80 dark:border-purple-900/40 flex items-center justify-between text-left transition-all cursor-pointer group"
+                              title="Bấm xem danh sách CTV ca chiều"
+                            >
+                              <div className="flex items-center text-purple-800 dark:text-purple-300">
+                                <span className="material-symbols-outlined text-[16px]">
+                                  wb_twilight
+                                </span>
+                              </div>
+                              <span className="text-[10px] font-bold bg-purple-200/80 dark:bg-purple-900/70 text-purple-900 dark:text-purple-200 px-1.5 py-0.5 rounded group-hover:scale-105 transition-transform">
+                                {afternoonCTVs.length} CTV
                               </span>
-                              <span>Ca Chiều</span>
-                            </div>
-                            <span className="text-[10px] font-bold bg-purple-200/80 dark:bg-purple-900/70 text-purple-900 dark:text-purple-200 px-1.5 py-0.2 rounded group-hover:scale-105 transition-transform">
-                              {afternoonCTVs.length} CTV
-                            </span>
-                          </button>
+                            </button>
+                          )}
                         </div>
                       </div>
                     );

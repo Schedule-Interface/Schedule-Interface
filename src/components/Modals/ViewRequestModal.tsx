@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { RegistrationRequest } from '../../types';
+import React, { useState } from "react";
+import { RegistrationRequest, formatPhoneNumber, formatDateOnly } from "../../types";
 
 interface ViewRequestModalProps {
   request: RegistrationRequest | null;
@@ -8,14 +8,16 @@ interface ViewRequestModalProps {
   onReject: (id: string) => void;
 }
 
-const DEFAULT_CCCD_FRONT = 'https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=600&q=80';
-const DEFAULT_CCCD_BACK = 'https://images.unsplash.com/photo-1586281380349-632531db7ed4?auto=format&fit=crop&w=600&q=80';
+const DEFAULT_CCCD_FRONT =
+  "https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=600&q=80";
+const DEFAULT_CCCD_BACK =
+  "https://images.unsplash.com/photo-1586281380349-632531db7ed4?auto=format&fit=crop&w=600&q=80";
 
 export const ViewRequestModal: React.FC<ViewRequestModalProps> = ({
   request,
   onClose,
   onApprove,
-  onReject
+  onReject,
 }) => {
   const [previewImg, setPreviewImg] = useState<{ title: string; url: string } | null>(null);
 
@@ -44,7 +46,9 @@ export const ViewRequestModal: React.FC<ViewRequestModalProps> = ({
             </div>
             <div>
               <h4 className="text-xl font-bold text-[#1a1b1e]">{request.name}</h4>
-              <p className="text-xs text-[#44474e]">Thời gian đăng ký: {request.submittedAt}</p>
+              <p className="text-xs text-[#44474e]">
+                Thời gian đăng ký: {formatDateOnly(request.submittedAt)}
+              </p>
             </div>
           </div>
 
@@ -55,7 +59,9 @@ export const ViewRequestModal: React.FC<ViewRequestModalProps> = ({
             </div>
             <div className="flex justify-between border-b border-slate-100 pb-2">
               <span className="text-[#74777f] font-medium">Số điện thoại:</span>
-              <span className="font-semibold text-[#1a1b1e]">{request.phone}</span>
+              <span className="font-semibold text-[#1a1b1e]">
+                {formatPhoneNumber(request.phone)}
+              </span>
             </div>
             <div className="flex justify-between border-b border-slate-100 pb-2">
               <span className="text-[#74777f] font-medium">Email:</span>
@@ -63,7 +69,7 @@ export const ViewRequestModal: React.FC<ViewRequestModalProps> = ({
             </div>
             <div className="flex justify-between">
               <span className="text-[#74777f] font-medium">Ngày sinh:</span>
-              <span className="font-semibold text-[#1a1b1e]">{request.dob || '14/05/1995'}</span>
+              <span className="font-semibold text-[#1a1b1e]">{request.dob || "14/05/1995"}</span>
             </div>
           </div>
 
@@ -74,11 +80,15 @@ export const ViewRequestModal: React.FC<ViewRequestModalProps> = ({
                 <span className="material-symbols-outlined text-[16px]">badge</span>
                 <span>Ảnh chụp CCCD (Mặt trước & Mặt sau)</span>
               </span>
-              <span className="text-[10px] text-slate-500 font-medium">Nhấn vào ảnh để phóng to</span>
+              <span className="text-[10px] text-slate-500 font-medium">
+                Nhấn vào ảnh để phóng to
+              </span>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div
-                onClick={() => setPreviewImg({ title: `CCCD Mặt trước - ${request.name}`, url: cccdFrontUrl })}
+                onClick={() =>
+                  setPreviewImg({ title: `CCCD Mặt trước - ${request.name}`, url: cccdFrontUrl })
+                }
                 className="relative group rounded-xl border border-slate-200 bg-white overflow-hidden h-24 cursor-pointer shadow-2xs hover:border-blue-400 transition-all"
               >
                 <img
@@ -93,7 +103,9 @@ export const ViewRequestModal: React.FC<ViewRequestModalProps> = ({
               </div>
 
               <div
-                onClick={() => setPreviewImg({ title: `CCCD Mặt sau - ${request.name}`, url: cccdBackUrl })}
+                onClick={() =>
+                  setPreviewImg({ title: `CCCD Mặt sau - ${request.name}`, url: cccdBackUrl })
+                }
                 className="relative group rounded-xl border border-slate-200 bg-white overflow-hidden h-24 cursor-pointer shadow-2xs hover:border-blue-400 transition-all"
               >
                 <img
@@ -109,7 +121,69 @@ export const ViewRequestModal: React.FC<ViewRequestModalProps> = ({
             </div>
           </div>
 
+          {/* CV Section */}
+          <div className="p-3.5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0]">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[11px] font-bold text-[#1b365d] uppercase tracking-wider flex items-center gap-1.5">
+                <span className="material-symbols-outlined text-[16px]">description</span>
+                <span>Hồ sơ ứng tuyển (CV)</span>
+              </span>
+            </div>
 
+            {request.cvFileName || request.cvFile ? (
+              <div className="p-2.5 bg-white border border-slate-200 rounded-xl flex items-center justify-between gap-3 shadow-2xs">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div
+                    className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${
+                      (request.cvFileName || "").toLowerCase().endsWith(".pdf")
+                        ? "bg-red-50 text-red-600 border border-red-200"
+                        : "bg-blue-50 text-blue-600 border border-blue-200"
+                    }`}
+                  >
+                    <span className="material-symbols-outlined text-[20px]">
+                      {(request.cvFileName || "").toLowerCase().endsWith(".pdf")
+                        ? "picture_as_pdf"
+                        : "description"}
+                    </span>
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-xs font-bold text-[#1a1b1e] truncate">
+                      {request.cvFileName || "Ho_so_CV.pdf"}
+                    </p>
+                    <p className="text-[10px] text-slate-500 font-medium">
+                      {request.cvFileSize || "1.2 MB"} • Hồ sơ đính kèm
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-1.5 shrink-0">
+                  {request.cvFile ? (
+                    <a
+                      href={request.cvFile}
+                      download={request.cvFileName || "CV.pdf"}
+                      className="px-2.5 py-1.5 bg-[#1b365d] text-white text-[11px] font-semibold rounded-lg hover:bg-[#002046] transition-colors flex items-center gap-1 shadow-2xs"
+                    >
+                      <span className="material-symbols-outlined text-[14px]">download</span>
+                      <span>Tải về</span>
+                    </a>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => alert(`Đang mở tài liệu: ${request.cvFileName || "CV"}`)}
+                      className="px-2.5 py-1.5 bg-[#1b365d] text-white text-[11px] font-semibold rounded-lg hover:bg-[#002046] transition-colors flex items-center gap-1 shadow-2xs cursor-pointer"
+                    >
+                      <span className="material-symbols-outlined text-[14px]">visibility</span>
+                      <span>Xem file</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div className="p-3 bg-white border border-dashed border-slate-200 rounded-xl text-center text-xs text-slate-400">
+                Chưa đính kèm file CV
+              </div>
+            )}
+          </div>
 
           <div className="pt-4 border-t border-[#E2E8F0] flex items-center justify-end gap-3">
             <button
@@ -119,7 +193,7 @@ export const ViewRequestModal: React.FC<ViewRequestModalProps> = ({
               Đóng
             </button>
 
-            {request.status === 'Chờ duyệt' && (
+            {request.status === "Chờ duyệt" && (
               <>
                 <button
                   onClick={() => {
@@ -152,9 +226,7 @@ export const ViewRequestModal: React.FC<ViewRequestModalProps> = ({
             <div className="flex items-center justify-between border-b border-slate-200 pb-3">
               <div className="flex items-center gap-2">
                 <span className="material-symbols-outlined text-[#1b365d] text-[20px]">badge</span>
-                <h3 className="font-bold text-sm text-[#1b365d]">
-                  {previewImg.title}
-                </h3>
+                <h3 className="font-bold text-sm text-[#1b365d]">{previewImg.title}</h3>
               </div>
               <button
                 onClick={() => setPreviewImg(null)}

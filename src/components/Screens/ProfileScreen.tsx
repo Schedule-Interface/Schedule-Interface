@@ -1,5 +1,5 @@
-import React, { useState, useRef } from 'react';
-import { UserAccount } from '../../types';
+import React, { useState, useRef } from "react";
+import { UserAccount, formatPhoneNumber } from "../../types";
 
 interface ProfileScreenProps {
   user: UserAccount;
@@ -20,9 +20,13 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
   onUpdateCccdFront,
   onUpdateCccdBack,
   isAdminViewing = false,
-  onBack
+  onBack,
 }) => {
-  const [previewModal, setPreviewModal] = useState<{ title: string; url: string; side: 'avatar' | 'front' | 'back' } | null>(null);
+  const [previewModal, setPreviewModal] = useState<{
+    title: string;
+    url: string;
+    side: "avatar" | "front" | "back";
+  } | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cccdFrontInputRef = useRef<HTMLInputElement>(null);
@@ -33,18 +37,18 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        if (typeof reader.result === 'string' && onUpdateAvatar) {
+        if (typeof reader.result === "string" && onUpdateAvatar) {
           onUpdateAvatar(reader.result);
         }
       };
       reader.readAsDataURL(file);
     }
-    e.target.value = '';
+    e.target.value = "";
   };
 
   const handleDeleteAvatar = () => {
     if (onUpdateAvatar) {
-      onUpdateAvatar('');
+      onUpdateAvatar("");
     }
   };
 
@@ -53,18 +57,18 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        if (typeof reader.result === 'string' && onUpdateCccdFront) {
+        if (typeof reader.result === "string" && onUpdateCccdFront) {
           onUpdateCccdFront(reader.result);
         }
       };
       reader.readAsDataURL(file);
     }
-    e.target.value = '';
+    e.target.value = "";
   };
 
   const handleDeleteCccdFront = () => {
     if (onUpdateCccdFront) {
-      onUpdateCccdFront('');
+      onUpdateCccdFront("");
     }
   };
 
@@ -73,18 +77,18 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        if (typeof reader.result === 'string' && onUpdateCccdBack) {
+        if (typeof reader.result === "string" && onUpdateCccdBack) {
           onUpdateCccdBack(reader.result);
         }
       };
       reader.readAsDataURL(file);
     }
-    e.target.value = '';
+    e.target.value = "";
   };
 
   const handleDeleteCccdBack = () => {
     if (onUpdateCccdBack) {
-      onUpdateCccdBack('');
+      onUpdateCccdBack("");
     }
   };
 
@@ -102,9 +106,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
               <span className="material-symbols-outlined text-[24px]">arrow_back</span>
             </button>
           )}
-          <h2 className="text-2xl font-bold text-[#1a1b1e] tracking-tight">
-            Thông tin tài khoản
-          </h2>
+          <h2 className="text-2xl font-bold text-[#1a1b1e] tracking-tight">Thông tin tài khoản</h2>
         </div>
       </div>
 
@@ -113,13 +115,12 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
         {/* Left Column (4 cols): Profile Card */}
         <div className="lg:col-span-4">
           <div className="bg-white dark:bg-[#25262b] border border-[#E2E8F0] dark:border-[#3b3d45] rounded-2xl p-6 shadow-xs flex flex-col items-center text-center relative">
-            
             {/* Interactive Avatar Container */}
             <div
               className="relative mb-4 group cursor-pointer"
               onClick={() => {
                 if (user.avatar) {
-                  setPreviewModal({ title: 'Ảnh đại diện', url: user.avatar, side: 'avatar' });
+                  setPreviewModal({ title: "Ảnh đại diện", url: user.avatar, side: "avatar" });
                 } else {
                   fileInputRef.current?.click();
                 }
@@ -187,7 +188,13 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
 
                   {user.cccdFront ? (
                     <div
-                      onClick={() => setPreviewModal({ title: 'CCCD - Mặt trước', url: user.cccdFront!, side: 'front' })}
+                      onClick={() =>
+                        setPreviewModal({
+                          title: "CCCD - Mặt trước",
+                          url: user.cccdFront!,
+                          side: "front",
+                        })
+                      }
                       className="relative group rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-[#1a1b1e] overflow-hidden h-28 cursor-pointer shadow-2xs"
                     >
                       <img
@@ -219,7 +226,13 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
 
                   {user.cccdBack ? (
                     <div
-                      onClick={() => setPreviewModal({ title: 'CCCD - Mặt sau', url: user.cccdBack!, side: 'back' })}
+                      onClick={() =>
+                        setPreviewModal({
+                          title: "CCCD - Mặt sau",
+                          url: user.cccdBack!,
+                          side: "back",
+                        })
+                      }
                       className="relative group rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-[#1a1b1e] overflow-hidden h-28 cursor-pointer shadow-2xs"
                     >
                       <img
@@ -293,7 +306,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                       Ngày sinh
                     </label>
                     <p className="text-sm font-semibold text-[#1a1b1e]">
-                      {user.dob || '15/08/1998'}
+                      {user.dob || "15/08/1998"}
                     </p>
                   </div>
 
@@ -308,7 +321,9 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                     <label className="block text-[11px] font-semibold text-[#74777f] mb-1">
                       Số điện thoại
                     </label>
-                    <p className="text-sm font-semibold text-[#1a1b1e]">{user.phone}</p>
+                    <p className="text-sm font-semibold text-[#1a1b1e]">
+                      {formatPhoneNumber(user.phone)}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -338,7 +353,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                       Ngày đăng ký
                     </label>
                     <p className="text-sm font-semibold text-[#1a1b1e]">
-                      {user.joinDate || '01/12/2023'}
+                      {user.joinDate || "01/12/2023"}
                     </p>
                   </div>
                 </div>
@@ -361,7 +376,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
             <div className="flex items-center justify-between pb-3 mb-3 border-b border-slate-200 dark:border-slate-700">
               <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
                 <span className="material-symbols-outlined text-blue-600">
-                  {previewModal.side === 'avatar' ? 'account_circle' : 'badge'}
+                  {previewModal.side === "avatar" ? "account_circle" : "badge"}
                 </span>
                 <span>{previewModal.title}</span>
               </h3>
@@ -387,9 +402,9 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                 onClick={() => {
                   const side = previewModal.side;
                   setPreviewModal(null);
-                  if (side === 'avatar') {
+                  if (side === "avatar") {
                     fileInputRef.current?.click();
-                  } else if (side === 'front') {
+                  } else if (side === "front") {
                     cccdFrontInputRef.current?.click();
                   } else {
                     cccdBackInputRef.current?.click();
@@ -407,9 +422,9 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                 onClick={() => {
                   const side = previewModal.side;
                   setPreviewModal(null);
-                  if (side === 'avatar') {
+                  if (side === "avatar") {
                     handleDeleteAvatar();
-                  } else if (side === 'front') {
+                  } else if (side === "front") {
                     handleDeleteCccdFront();
                   } else {
                     handleDeleteCccdBack();
@@ -430,4 +445,3 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
 };
 
 export default ProfileScreen;
-

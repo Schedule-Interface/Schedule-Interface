@@ -1,11 +1,13 @@
-import React, { useState } from "react";
-import { UserAccount, ShiftSlot } from "../../types";
+import React, { useState, useEffect, useMemo } from "react";
+import { UserAccount, ShiftSlot, formatPhoneNumber } from "../../types";
 
 interface ViewAccountDetailModalProps {
   account: UserAccount | null;
   shifts?: ShiftSlot[];
   onClose: () => void;
   onToggleStatus: (id: string) => void;
+  onSaveNotes?: (id: string, notes: string) => void;
+  onEndSchedule?: (id: string, startDate: string, endDate: string, reason: string) => void;
 }
 
 const DEFAULT_CCCD_FRONT =
@@ -26,13 +28,175 @@ export const ViewAccountDetailModal: React.FC<ViewAccountDetailModalProps> = ({
   shifts = [],
   onClose,
   onToggleStatus,
+  onSaveNotes,
+  onEndSchedule,
 }) => {
   const [previewImg, setPreviewImg] = useState<{ title: string; url: string } | null>(null);
+  const [previewDoc, setPreviewDoc] = useState<{
+    fileName: string;
+    fileSize: string;
+    isPdf: boolean;
+  } | null>(null);
+
+  const [notesText, setNotesText] = useState(account?.notes || "");
+  const [isSavedNotes, setIsSavedNotes] = useState(false);
+
+  // End Schedule Popup states
+  const [isEndScheduleModalOpen, setIsEndScheduleModalOpen] = useState(false);
+  const [endScheduleEndDate, setEndScheduleEndDate] = useState(
+    new Date().toISOString().split("T")[0],
+  );
+  const [endScheduleReason, setEndScheduleReason] = useState("");
+  const [endScheduleError, setEndScheduleError] = useState("");
+
+  useEffect(() => {
+    setNotesText(account?.notes || "");
+    setIsSavedNotes(false);
+  }, [account?.id, account?.notes]);
+
+  // Compute registered start date for this CTV
+  const userRegisteredStartDateISO = useMemo(() => {
+    if (!account) return new Date().toISOString().split("T")[0];
+    const userShifts = shifts.filter((s) =>
+      (s.assignedCTVs || []).some((c) => c.id === account.id || c.name === account.name),
+    );
+
+    let earliest = "";
+    userShifts.forEach((s) => {
+      const candidate = s.registrationStartDate || s.workDate;
+      if (candidate && /^\d{4}-\d{2}-\d{2}$/.test(candidate)) {
+        if (!earliest || candidate < earliest) {
+          earliest = candidate;
+        }
+      }
+    });
+
+    if (earliest) return earliest;
+
+    if (account.joinDate) {
+      if (/^\d{4}-\d{2}-\d{2}$/.test(account.joinDate)) return account.joinDate;
+      if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(account.joinDate)) {
+        const parts = account.joinDate.split("/");
+        return `${parts[2]}-${parts[1].padStart(2, "0")}-${parts[0].padStart(2, "0")}`;
+      }
+    }
+    if (account.registerDate) {
+      if (/^\d{4}-\d{2}-\d{2}$/.test(account.registerDate)) return account.registerDate;
+      if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(account.registerDate)) {
+        const parts = account.registerDate.split("/");
+        return `${parts[2]}-${parts[1].padStart(2, "0")}-${parts[0].padStart(2, "0")}`;
+      }
+    }
+
+    return new Date().toISOString().split("T")[0];
+  }, [account, shifts]);
+
+  const userRegisteredStartDateFormatted = useMemo(() => {
+    if (!userRegisteredStartDateISO) return "";
+    const parts = userRegisteredStartDateISO.split("-");
+    if (parts.length === 3) {
+      return `${parts[2]}/${parts[1]}/${parts[0]}`;
+    }
+    return userRegisteredStartDateISO;
+  }, [userRegisteredStartDateISO]);
 
   if (!account) return null;
 
+  const handleSaveNotes = () => {
+    if (account) {
+      if (onSaveNotes) {
+        onSaveNotes(account.id, notesText);
+      }
+      setIsSavedNotes(true);
+      setTimeout(() => setIsSavedNotes(false), 2000);
+    }
+  };
+
+  const formatDisplayDate = (isoStr: string) => {
+    if (!isoStr) return "";
+    const parts = isoStr.split("-");
+    if (parts.length === 3) {
+      return `${parts[2]}/${parts[1]}/${parts[0]}`;
+    }
+    return isoStr;
+  };
+
+  const handleConfirmEndSchedule = () => {
+    if (!endScheduleEndDate) {
+      setEndScheduleError("Vui lòng chọn ngày kết thúc làm việc.");
+      return;
+    }
+    if (endScheduleEndDate < userRegisteredStartDateISO) {
+      setEndScheduleError("Ngày kết thúc không thể trước ngày bắt đầu đăng ký làm việc.");
+      return;
+    }
+    if (onEndSchedule && account) {
+      onEndSchedule(
+        account.id,
+        userRegisteredStartDateFormatted,
+        formatDisplayDate(endScheduleEndDate),
+        endScheduleReason,
+      );
+    }
+    setIsEndScheduleModalOpen(false);
+  };
+
   const cccdFrontUrl = account.cccdFront || DEFAULT_CCCD_FRONT;
   const cccdBackUrl = account.cccdBack || DEFAULT_CCCD_BACK;
+
+  const cvFileName =
+    account.cvFileName ||
+    `CV_${account.name
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-zA-Z0-9]/g, "_")}_HoSo.pdf`;
+  const cvFileSize = account.cvFileSize || "1.5 MB";
+  const isPdf = cvFileName.toLowerCase().endsWith(".pdf");
+
+  const handleDownloadCV = () => {
+    if (account.cvFile) {
+      const a = document.createElement("a");
+      a.href = account.cvFile;
+      a.download = cvFileName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    } else {
+      const content = `=========================================
+HỒ SƠ ỨNG TUYỂN CỘNG TÁC VIÊN (CV)
+=========================================
+Họ và tên: ${account.name}
+Mã CTV: ${account.cctvCode || "N/A"}
+Email: ${account.email}
+Số điện thoại: ${account.phone}
+Ngày sinh: ${account.dob || "N/A"}
+Giới tính: ${account.gender || "N/A"}
+Địa chỉ: ${account.address || "N/A"}
+
+PHÒNG LÀM VIỆC ĐƯỢC CHỈ ĐỊNH:
+- Phòng / Buồng: ${account.room || account.workRoom || "Buồng 1"}
+
+KỸ NĂNG & CHUYÊN MÔN:
+- ${account.skills && account.skills.length > 0 ? account.skills.join("\n- ") : "Kỹ năng chuyên môn, giao tiếp tốt"}
+
+LỊCH SỬ HOẠT ĐỘNG:
+- Ngày đăng ký: ${account.registerDate || "N/A"}
+- Ngày gia nhập: ${account.joinDate || account.registerDate || "N/A"}
+- Số ca hoàn thành: ${account.shiftsCompleted || 0} ca
+- Đánh giá trung bình: ${account.rating || 5.0} / 5.0 ⭐
+- Trạng thái tài khoản: ${account.status}
+`;
+      const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = cvFileName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+  };
 
   // Check if user has explicit registered shifts in the shifts array
   const userShiftsInArray = shifts.filter((s) =>
@@ -81,14 +245,32 @@ export const ViewAccountDetailModal: React.FC<ViewAccountDetailModalProps> = ({
     }
   };
 
-  // Calculate summary counts for Mon-Fri
-  let morningWorkCount = 0;
-  let afternoonWorkCount = 0;
+  // Determine assigned work room for CTV
+  const assignedWorkRoom = (() => {
+    if (account.workRoom) return account.workRoom;
+    if (account.room) return account.room;
+    // Look up in shifts if available
+    const userShift = shifts?.find((s) =>
+      s.assignedCTVs?.some(
+        (c) =>
+          c.id === account.id ||
+          c.name === account.name ||
+          (c.cctvCode && c.cctvCode === account.cctvCode),
+      ),
+    );
+    if (userShift?.room) return userShift.room;
 
-  WEEKDAYS.forEach((day) => {
-    if (getShiftStatus(day.index, "morning") !== "off") morningWorkCount++;
-    if (getShiftStatus(day.index, "afternoon") !== "off") afternoonWorkCount++;
-  });
+    // Assign consistent default room based on cctvCode or initials
+    const codeNum = parseInt(account.cctvCode?.replace(/\D/g, "") || "1", 10);
+    const roomList = [
+      "Buồng 1",
+      "Buồng 2",
+      "Phòng Kỹ thuật - Buồng 1",
+      "Phòng Điều phối 102",
+      "Buồng 3",
+    ];
+    return roomList[codeNum % roomList.length] || "Buồng 1";
+  })();
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-xs z-50 flex items-center justify-center p-4 overflow-y-auto">
@@ -180,7 +362,7 @@ export const ViewAccountDetailModal: React.FC<ViewAccountDetailModalProps> = ({
               <div className="flex justify-between p-2 rounded bg-white dark:bg-[#25262b] border border-[#E2E8F0]/60 dark:border-[#3b3d45]">
                 <span className="text-[#74777f]">Số điện thoại:</span>
                 <span className="font-semibold text-[#1b365d] dark:text-white">
-                  {account.phone}
+                  {formatPhoneNumber(account.phone)}
                 </span>
               </div>
               <div className="flex justify-between p-2 rounded bg-white dark:bg-[#25262b] border border-[#E2E8F0]/60 dark:border-[#3b3d45]">
@@ -237,17 +419,90 @@ export const ViewAccountDetailModal: React.FC<ViewAccountDetailModalProps> = ({
                 </div>
               </div>
             </div>
+
+            {/* CV Document Box */}
+            <div className="mt-3 p-3.5 rounded-xl bg-[#F8FAFC] dark:bg-[#1e1f23] border border-[#E2E8F0] dark:border-[#3b3d45]">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[11px] font-bold text-[#1b365d] dark:text-[#d6e3ff] uppercase tracking-wider flex items-center gap-1.5">
+                  <span className="material-symbols-outlined text-[16px] text-indigo-600 dark:text-indigo-400">
+                    description
+                  </span>
+                  <span>Hồ sơ ứng tuyển (CV)</span>
+                </span>
+              </div>
+              <div className="p-2.5 bg-white dark:bg-[#25262b] border border-slate-200 dark:border-slate-700 rounded-xl flex items-center justify-between gap-3 shadow-2xs">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div
+                    className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-2xs ${
+                      isPdf
+                        ? "bg-red-50 text-red-600 border border-red-200/80 dark:bg-red-950/50 dark:text-red-300 dark:border-red-900/60"
+                        : "bg-blue-50 text-blue-600 border border-blue-200/80 dark:bg-blue-950/50 dark:text-blue-300 dark:border-blue-900/60"
+                    }`}
+                  >
+                    <span className="material-symbols-outlined text-[22px]">
+                      {isPdf ? "picture_as_pdf" : "description"}
+                    </span>
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-xs font-bold text-[#1a1b1e] dark:text-white truncate">
+                      {cvFileName}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setPreviewDoc({
+                        fileName: cvFileName,
+                        fileSize: cvFileSize,
+                        isPdf,
+                      })
+                    }
+                    className="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-[11px] font-bold rounded-lg transition-colors flex items-center gap-1 shadow-2xs cursor-pointer border border-slate-200 dark:border-slate-700"
+                  >
+                    <span className="material-symbols-outlined text-[15px]">visibility</span>
+                    <span>Xem file</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleDownloadCV}
+                    className="px-2.5 py-1.5 bg-[#1b365d] hover:bg-[#002046] dark:bg-indigo-600 dark:hover:bg-indigo-700 text-white text-[11px] font-bold rounded-lg transition-colors flex items-center gap-1 shadow-2xs cursor-pointer"
+                  >
+                    <span className="material-symbols-outlined text-[15px]">download</span>
+                    <span>Tải về</span>
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Section 2: Monday - Friday Schedule (Ca sáng & Ca chiều) */}
           <div>
-            <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
               <h5 className="text-xs font-bold text-[#1b365d] dark:text-[#d6e3ff] uppercase tracking-wider flex items-center gap-1.5">
                 <span className="material-symbols-outlined text-[16px] text-indigo-600">
                   calendar_month
                 </span>
                 <span>Lịch trình làm việc (Thứ 2 đến Thứ 6)</span>
               </h5>
+
+              {/* Work room badge */}
+              {account.role !== "Admin" && (
+                <div
+                  title={`Phòng làm việc: ${assignedWorkRoom}`}
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-indigo-50/80 dark:bg-indigo-950/40 text-indigo-900 dark:text-indigo-200 border border-indigo-200/80 dark:border-indigo-800/80 rounded-lg text-xs font-semibold shadow-2xs"
+                >
+                  <span className="material-symbols-outlined text-[15px] text-indigo-600 dark:text-indigo-400">
+                    meeting_room
+                  </span>
+                  <span className="font-bold text-[#1b365d] dark:text-[#93c5fd]">
+                    {assignedWorkRoom}
+                  </span>
+                </div>
+              )}
             </div>
 
             {account.role === "Admin" ? (
@@ -266,7 +521,7 @@ export const ViewAccountDetailModal: React.FC<ViewAccountDetailModalProps> = ({
                     return (
                       <div
                         key={day.index}
-                        className="bg-[#F8FAFC] dark:bg-[#1e1f23] border border-[#E2E8F0] dark:border-[#3b3d45] rounded-xl overflow-hidden flex flex-col justify-between"
+                        className="bg-[#F8FAFC] dark:bg-[#1e1f23] border border-[#E2E8F0] dark:border-[#3b3d45] rounded-xl overflow-hidden flex flex-col"
                       >
                         {/* Day Header */}
                         <div className="p-2 bg-[#1b365d]/5 dark:bg-[#1b365d]/20 border-b border-[#E2E8F0] dark:border-[#3b3d45] text-center">
@@ -276,50 +531,54 @@ export const ViewAccountDetailModal: React.FC<ViewAccountDetailModalProps> = ({
                         </div>
 
                         {/* Shifts for this Day */}
-                        <div className="p-2 space-y-2 my-auto">
-                          {/* Ca Sáng */}
-                          <div className="text-center p-2 rounded-lg border border-[#E2E8F0] dark:border-[#3b3d45] bg-white dark:bg-[#25262b] transition-all flex flex-col items-center justify-center">
-                            <div className="text-[10px] text-[#74777f] dark:text-[#c4c6cf] font-medium mb-1.5">
-                              Ca sáng
-                            </div>
+                        <div className="flex flex-col">
+                          {/* Morning slot (Top) */}
+                          <div className="p-2 min-h-[48px] flex items-center justify-center border-b border-[#E2E8F0] dark:border-[#3b3d45]">
                             {morning === "working" ? (
-                              <div className="w-full h-7 flex items-center justify-center gap-1 rounded-md font-bold bg-amber-50 text-amber-800 border border-amber-300 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800 text-[11px]">
-                                <span className="material-symbols-outlined text-[13px]">
+                              <div
+                                title="Ca sáng: Đi làm"
+                                className="w-full h-8 flex items-center justify-center rounded-lg bg-amber-50 text-amber-800 border border-amber-300 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800 shadow-2xs"
+                              >
+                                <span className="material-symbols-outlined text-[20px]">
                                   wb_sunny
                                 </span>
-                                <span>Đi làm</span>
                               </div>
                             ) : morning === "pending" ? (
-                              <div className="w-full h-7 flex items-center justify-center gap-1 rounded-md font-bold bg-amber-100 text-amber-900 border border-amber-400 dark:bg-amber-900/50 dark:text-amber-200 text-[11px]">
-                                <span>Chờ duyệt</span>
+                              <div
+                                title="Ca sáng: Chờ duyệt"
+                                className="w-full h-8 flex items-center justify-center rounded-lg bg-amber-100 text-amber-900 border border-amber-400 dark:bg-amber-900/50 dark:text-amber-200 shadow-2xs"
+                              >
+                                <span className="material-symbols-outlined text-[20px]">
+                                  wb_sunny
+                                </span>
                               </div>
                             ) : (
-                              <div className="w-full h-7 flex items-center justify-center gap-1 rounded-md font-semibold text-slate-500 bg-slate-100 border border-slate-200/80 dark:bg-slate-800/80 dark:text-slate-400 dark:border-slate-700/60 text-[11px]">
-                                <span>Nghỉ</span>
-                              </div>
+                              <div className="w-full h-8" />
                             )}
                           </div>
 
-                          {/* Ca Chiều */}
-                          <div className="text-center p-2 rounded-lg border border-[#E2E8F0] dark:border-[#3b3d45] bg-white dark:bg-[#25262b] transition-all flex flex-col items-center justify-center">
-                            <div className="text-[10px] text-[#74777f] dark:text-[#c4c6cf] font-medium mb-1.5">
-                              Ca chiều
-                            </div>
+                          {/* Afternoon slot (Bottom) */}
+                          <div className="p-2 min-h-[48px] flex items-center justify-center">
                             {afternoon === "working" ? (
-                              <div className="w-full h-7 flex items-center justify-center gap-1 rounded-md font-bold bg-purple-50 text-purple-800 border border-purple-300 dark:bg-purple-950/60 dark:text-purple-300 dark:border-purple-800 text-[11px]">
-                                <span className="material-symbols-outlined text-[13px]">
+                              <div
+                                title="Ca chiều: Đi làm"
+                                className="w-full h-8 flex items-center justify-center rounded-lg bg-purple-50 text-purple-800 border border-purple-300 dark:bg-purple-950/60 dark:text-purple-300 dark:border-purple-800 shadow-2xs"
+                              >
+                                <span className="material-symbols-outlined text-[20px]">
                                   wb_twilight
                                 </span>
-                                <span>Đi làm</span>
                               </div>
                             ) : afternoon === "pending" ? (
-                              <div className="w-full h-7 flex items-center justify-center gap-1 rounded-md font-bold bg-purple-100 text-purple-900 border border-purple-400 dark:bg-purple-900/50 dark:text-purple-200 text-[11px]">
-                                <span>Chờ duyệt</span>
+                              <div
+                                title="Ca chiều: Chờ duyệt"
+                                className="w-full h-8 flex items-center justify-center rounded-lg bg-purple-100 text-purple-900 border border-purple-400 dark:bg-purple-900/50 dark:text-purple-200 shadow-2xs"
+                              >
+                                <span className="material-symbols-outlined text-[20px]">
+                                  wb_twilight
+                                </span>
                               </div>
                             ) : (
-                              <div className="w-full h-7 flex items-center justify-center gap-1 rounded-md font-semibold text-slate-500 bg-slate-100 border border-slate-200/80 dark:bg-slate-800/80 dark:text-slate-400 dark:border-slate-700/60 text-[11px]">
-                                <span>Nghỉ</span>
-                              </div>
+                              <div className="w-full h-8" />
                             )}
                           </div>
                         </div>
@@ -327,26 +586,46 @@ export const ViewAccountDetailModal: React.FC<ViewAccountDetailModalProps> = ({
                     );
                   })}
                 </div>
-
-                {/* Schedule Summary Bar */}
-                <div className="mt-3 p-3 bg-indigo-50/50 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-800 rounded-xl flex items-center justify-between text-xs">
-                  <div className="flex items-center gap-2 text-indigo-900 dark:text-indigo-200 font-medium">
-                    <span className="material-symbols-outlined text-[18px] text-indigo-600">
-                      info
-                    </span>
-                    <span>Thống kê ca từ T2 - T6:</span>
-                  </div>
-                  <div className="flex items-center gap-3 font-bold">
-                    <span className="text-amber-700 dark:text-amber-300 bg-amber-100/80 dark:bg-amber-950/60 px-2 py-0.5 rounded">
-                      ☀️ Sáng: {morningWorkCount} buổi
-                    </span>
-                    <span className="text-purple-700 dark:text-purple-300 bg-purple-100/80 dark:bg-purple-950/60 px-2 py-0.5 rounded">
-                      ⛅ Chiều: {afternoonWorkCount} buổi
-                    </span>
-                  </div>
-                </div>
               </>
             )}
+          </div>
+
+          {/* Section 3: Notes (Ghi chú) */}
+          <div className="p-4 rounded-xl bg-[#F8FAFC] dark:bg-[#1e1f23] border border-[#E2E8F0] dark:border-[#3b3d45] space-y-2.5">
+            <div className="flex items-center justify-between">
+              <h5 className="text-xs font-bold text-[#1b365d] dark:text-[#d6e3ff] uppercase tracking-wider flex items-center gap-1.5">
+                <span className="material-symbols-outlined text-[16px] text-amber-600 dark:text-amber-400">
+                  edit_note
+                </span>
+                <span>Ghi chú</span>
+              </h5>
+            </div>
+
+            <div className="relative">
+              <textarea
+                value={notesText}
+                onChange={(e) => setNotesText(e.target.value)}
+                rows={3}
+                className="w-full text-xs p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-[#25262b] text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition-all resize-none shadow-2xs leading-relaxed"
+              />
+            </div>
+
+            <div className="flex items-center justify-end pt-1">
+              <button
+                type="button"
+                onClick={handleSaveNotes}
+                className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs ${
+                  isSavedNotes
+                    ? "bg-emerald-600 text-white"
+                    : "bg-[#1b365d] hover:bg-[#002046] dark:bg-indigo-600 dark:hover:bg-indigo-700 text-white"
+                }`}
+              >
+                <span className="material-symbols-outlined text-[15px]">
+                  {isSavedNotes ? "check_circle" : "save"}
+                </span>
+                <span>{isSavedNotes ? "Đã lưu" : "Lưu"}</span>
+              </button>
+            </div>
           </div>
 
           {/* Bottom Action Controls */}
@@ -365,14 +644,146 @@ export const ViewAccountDetailModal: React.FC<ViewAccountDetailModalProps> = ({
               {account.status === "Kích hoạt" ? "Vô hiệu hóa tài khoản" : "Kích hoạt tài khoản"}
             </button>
             <button
-              onClick={onClose}
-              className="px-5 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs rounded-xl transition-colors cursor-pointer"
+              type="button"
+              onClick={() => {
+                setIsEndScheduleModalOpen(true);
+                setEndScheduleError("");
+                setEndScheduleReason("");
+                setEndScheduleEndDate(new Date().toISOString().split("T")[0]);
+              }}
+              className="px-4 py-2 bg-rose-600 hover:bg-rose-700 dark:bg-rose-600 dark:hover:bg-rose-700 text-white font-bold text-xs rounded-xl transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs"
             >
-              Đóng
+              <span className="material-symbols-outlined text-[16px]">event_busy</span>
+              <span>Kết thúc lịch làm việc</span>
             </button>
           </div>
         </div>
       </div>
+
+      {/* END SCHEDULE POPUP MODAL */}
+      {isEndScheduleModalOpen && (
+        <div className="fixed inset-0 z-60 bg-black/80 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-[#25262b] border border-slate-200 dark:border-slate-700 rounded-2xl max-w-lg w-full p-5 shadow-2xl space-y-4 animate-in zoom-in-95 duration-150">
+            {/* Header */}
+            <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-700 pb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 dark:bg-rose-950/60 dark:text-rose-300 flex items-center justify-center">
+                  <span className="material-symbols-outlined text-[18px]">event_busy</span>
+                </div>
+                <div>
+                  <h3 className="font-bold text-sm text-[#1b365d] dark:text-[#d6e3ff]">
+                    Kết thúc lịch làm việc
+                  </h3>
+                  <p className="text-[11px] text-slate-500">
+                    {account.name} {account.cctvCode ? `• ${account.cctvCode}` : ""}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsEndScheduleModalOpen(false)}
+                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1 rounded-full cursor-pointer"
+              >
+                <span className="material-symbols-outlined text-[20px]">close</span>
+              </button>
+            </div>
+
+            {/* Explanation card */}
+            <div className="p-3 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/60 rounded-xl text-amber-800 dark:text-amber-300 text-xs flex items-start gap-2.5">
+              <span className="material-symbols-outlined text-[18px] shrink-0 text-amber-600 dark:text-amber-400 mt-0.5">
+                info
+              </span>
+              <p className="leading-relaxed text-[11px]">
+                Lịch làm việc từ <strong>ngày bắt đầu</strong> đến <strong>ngày kết thúc</strong>{" "}
+                vẫn được ghi nhận. Hệ thống sẽ <strong>tự động loại bỏ các ca đăng ký thừa</strong>{" "}
+                sau ngày kết thúc đã chọn để tránh lịch ảo.
+              </p>
+            </div>
+
+            {/* Date Selection */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {/* Ngày bắt đầu (CTV đã chọn để đăng ký) */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1">
+                  <span>Ngày bắt đầu</span>
+                  <span className="text-[10px] font-normal text-slate-400">(CTV đã đăng ký)</span>
+                </label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    readOnly
+                    value={userRegisteredStartDateFormatted}
+                    className="w-full text-xs font-semibold p-2.5 pl-8 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 cursor-not-allowed"
+                  />
+                  <span className="material-symbols-outlined text-[16px] text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2">
+                    event_available
+                  </span>
+                </div>
+              </div>
+
+              {/* Ngày kết thúc (Admin sẽ chọn) */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1">
+                  <span>Ngày kết thúc</span>
+                  <span className="text-rose-500 font-bold">*</span>
+                </label>
+                <div className="relative">
+                  <input
+                    type="date"
+                    value={endScheduleEndDate}
+                    min={userRegisteredStartDateISO}
+                    onChange={(e) => {
+                      setEndScheduleEndDate(e.target.value);
+                      if (endScheduleError) setEndScheduleError("");
+                    }}
+                    className="w-full text-xs font-semibold p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-[#25262b] text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-rose-500/30 focus:border-rose-500 transition-all cursor-pointer"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Lý do kết thúc (Textarea) */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Lý do</label>
+              <textarea
+                value={endScheduleReason}
+                onChange={(e) => {
+                  setEndScheduleReason(e.target.value);
+                  if (endScheduleError) setEndScheduleError("");
+                }}
+                placeholder="Nhập lý do kết thúc lịch làm việc (ví dụ: Nghỉ việc đột xuất, bận việc học/cá nhân, hoàn thành kỳ thực tập...)..."
+                rows={3}
+                className="w-full text-xs p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-[#25262b] text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-rose-500/30 focus:border-rose-500 transition-all resize-none shadow-2xs leading-relaxed"
+              />
+            </div>
+
+            {endScheduleError && (
+              <p className="text-xs font-semibold text-rose-600 dark:text-rose-400 flex items-center gap-1">
+                <span className="material-symbols-outlined text-[16px]">error</span>
+                <span>{endScheduleError}</span>
+              </p>
+            )}
+
+            {/* Footer */}
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-200 dark:border-slate-700">
+              <button
+                type="button"
+                onClick={() => setIsEndScheduleModalOpen(false)}
+                className="px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs rounded-xl transition-colors cursor-pointer"
+              >
+                Hủy
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmEndSchedule}
+                className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded-xl transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs"
+              >
+                <span className="material-symbols-outlined text-[16px]">check_circle</span>
+                <span>Xác nhận</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* CCCD LIGHTBOX PREVIEW MODAL */}
       {previewImg && (
@@ -408,6 +819,166 @@ export const ViewAccountDetailModal: React.FC<ViewAccountDetailModalProps> = ({
               >
                 Đóng
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* CV DOCUMENT PREVIEW MODAL */}
+      {previewDoc && (
+        <div className="fixed inset-0 z-60 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-[#25262b] border border-slate-200 dark:border-slate-700 rounded-2xl max-w-2xl w-full p-5 shadow-2xl space-y-4 max-h-[90vh] flex flex-col">
+            {/* Header */}
+            <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-700 pb-3">
+              <div className="flex items-center gap-2.5">
+                <div
+                  className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+                    previewDoc.isPdf
+                      ? "bg-red-50 text-red-600 border border-red-200"
+                      : "bg-blue-50 text-blue-600 border border-blue-200"
+                  }`}
+                >
+                  <span className="material-symbols-outlined text-[18px]">
+                    {previewDoc.isPdf ? "picture_as_pdf" : "description"}
+                  </span>
+                </div>
+                <div>
+                  <h3 className="font-bold text-sm text-[#1b365d] dark:text-[#d6e3ff]">
+                    {previewDoc.fileName}
+                  </h3>
+                  <p className="text-[11px] text-slate-500">
+                    {previewDoc.fileSize} • Hồ sơ đính kèm của CTV
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setPreviewDoc(null)}
+                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1 rounded-full cursor-pointer"
+              >
+                <span className="material-symbols-outlined text-[20px]">close</span>
+              </button>
+            </div>
+
+            {/* Document Content Simulation Viewer */}
+            <div className="flex-1 overflow-y-auto p-6 bg-slate-50 dark:bg-slate-900/60 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 space-y-4 font-sans text-xs shadow-inner">
+              <div className="bg-white dark:bg-[#1e1f23] p-6 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm space-y-5">
+                {/* CV Header */}
+                <div className="border-b border-slate-200 dark:border-slate-700 pb-4 flex items-start justify-between gap-4">
+                  <div>
+                    <h2 className="text-base font-bold text-[#1b365d] dark:text-white uppercase tracking-wide">
+                      {account.name}
+                    </h2>
+                    <p className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 mt-0.5">
+                      Vị trí ứng tuyển: Cộng tác viên{" "}
+                      {account.cctvCode ? `(${account.cctvCode})` : ""}
+                    </p>
+                    <p className="text-[11px] text-slate-500 mt-1">
+                      Phòng làm việc:{" "}
+                      <span className="font-semibold text-slate-700 dark:text-slate-300">
+                        {assignedWorkRoom}
+                      </span>
+                    </p>
+                  </div>
+                  <div className="text-right text-[11px] text-slate-500 space-y-0.5 shrink-0">
+                    <p>📧 {account.email}</p>
+                    <p>📞 {account.phone}</p>
+                    <p>📍 {account.address || "TP. Hồ Chí Minh"}</p>
+                  </div>
+                </div>
+
+                {/* Section 1: Thông tin cá nhân */}
+                <div>
+                  <h4 className="text-xs font-bold text-[#1b365d] dark:text-indigo-300 uppercase tracking-wider mb-2 border-b border-slate-100 dark:border-slate-800 pb-1">
+                    1. Thông tin chung
+                  </h4>
+                  <div className="grid grid-cols-2 gap-2 text-[11px]">
+                    <p>
+                      <span className="text-slate-500">Ngày sinh:</span>{" "}
+                      <span className="font-medium">{account.dob || "Chưa cập nhật"}</span>
+                    </p>
+                    <p>
+                      <span className="text-slate-500">Giới tính:</span>{" "}
+                      <span className="font-medium">{account.gender || "Nam"}</span>
+                    </p>
+                    <p>
+                      <span className="text-slate-500">Số CCCD:</span>{" "}
+                      <span className="font-medium">{account.cccd || "Đã xác thực"}</span>
+                    </p>
+                    <p>
+                      <span className="text-slate-500">Ngày tham gia:</span>{" "}
+                      <span className="font-medium">
+                        {account.joinDate || account.registerDate || "01/12/2023"}
+                      </span>
+                    </p>
+                  </div>
+                </div>
+
+                {/* Section 2: Kỹ năng & Chuyên môn */}
+                <div>
+                  <h4 className="text-xs font-bold text-[#1b365d] dark:text-indigo-300 uppercase tracking-wider mb-2 border-b border-slate-100 dark:border-slate-800 pb-1">
+                    2. Kỹ năng & Chuyên môn
+                  </h4>
+                  <div className="flex flex-wrap gap-1.5">
+                    {(
+                      account.skills || [
+                        "Tin học văn phòng",
+                        "Giao tiếp cơ bản",
+                        "Hỗ trợ sự kiện",
+                        "Làm việc nhóm",
+                      ]
+                    ).map((skill, idx) => (
+                      <span
+                        key={idx}
+                        className="px-2 py-0.5 bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 rounded text-[10px] font-medium"
+                      >
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Section 3: Quá trình hoạt động */}
+                <div>
+                  <h4 className="text-xs font-bold text-[#1b365d] dark:text-indigo-300 uppercase tracking-wider mb-2 border-b border-slate-100 dark:border-slate-800 pb-1">
+                    3. Lịch sử & Đánh giá công việc
+                  </h4>
+                  <div className="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg text-[11px] space-y-1">
+                    <p>
+                      • <strong>Số ca đã hoàn thành:</strong> {account.shiftsCompleted || 0} ca trực
+                    </p>
+                    <p>
+                      • <strong>Đánh giá hiệu suất:</strong> {account.rating || 5.0} / 5.0 ⭐ (Đạt
+                      chuẩn)
+                    </p>
+                    <p>
+                      • <strong>Tình trạng hồ sơ:</strong> Đã kiểm tra & phê duyệt hợp lệ
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="flex items-center justify-between pt-2 border-t border-slate-200 dark:border-slate-700">
+              <span className="text-[11px] text-slate-500">
+                Tài liệu định dạng chuẩn:{" "}
+                {previewDoc.isPdf ? "Portable Document Format (.pdf)" : "Microsoft Word (.docx)"}
+              </span>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handleDownloadCV}
+                  className="px-4 py-2 bg-[#1b365d] hover:bg-[#002046] dark:bg-indigo-600 dark:hover:bg-indigo-700 text-white font-bold text-xs rounded-xl transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs"
+                >
+                  <span className="material-symbols-outlined text-[16px]">download</span>
+                  <span>Tải file về máy</span>
+                </button>
+                <button
+                  onClick={() => setPreviewDoc(null)}
+                  className="px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs rounded-xl transition-colors cursor-pointer"
+                >
+                  Đóng
+                </button>
+              </div>
             </div>
           </div>
         </div>

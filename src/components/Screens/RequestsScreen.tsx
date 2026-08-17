@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { RegistrationRequest } from "../../types";
+import { RegistrationRequest, formatPhoneNumber, formatDateOnly } from "../../types";
 import { RejectReasonModal } from "../Modals/RejectReasonModal";
 
 interface RequestsScreenProps {
@@ -136,12 +136,15 @@ export const RequestsScreen: React.FC<RequestsScreenProps> = ({
                           <div className="font-semibold text-sm text-[#1b365d] group-hover/name:underline">
                             {req.name}
                           </div>
-                          <div className="text-xs text-[#44474e]">{req.email}</div>
                         </div>
                       </div>
                     </td>
-                    <td className="py-3.5 px-4 text-sm text-[#1a1b1e] font-medium">{req.phone}</td>
-                    <td className="py-3.5 px-4 text-sm text-[#44474e]">{req.submittedAt}</td>
+                    <td className="py-3.5 px-4 text-sm text-[#1a1b1e] font-medium">
+                      {req.phone ? formatPhoneNumber(req.phone) : "---"}
+                    </td>
+                    <td className="py-3.5 px-4 text-sm text-[#44474e]">
+                      {formatDateOnly(req.submittedAt)}
+                    </td>
                     <td className="py-3.5 px-4 text-right">
                       <div className="flex items-center justify-end gap-1 opacity-90 group-hover:opacity-100 transition-opacity">
                         {req.status === "Chờ duyệt" && (
@@ -174,20 +177,7 @@ export const RequestsScreen: React.FC<RequestsScreenProps> = ({
         </div>
 
         {/* Pagination Footer */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 border-t border-[#E2E8F0] bg-white">
-          <div className="text-sm text-[#44474e]">
-            Hiển thị{" "}
-            <span className="font-semibold text-[#1a1b1e]">
-              {filteredRequests.length > 0 ? startIndex + 1 : 0}
-            </span>{" "}
-            đến{" "}
-            <span className="font-semibold text-[#1a1b1e]">
-              {Math.min(startIndex + itemsPerPage, filteredRequests.length)}
-            </span>{" "}
-            trong <span className="font-semibold text-[#1a1b1e]">{filteredRequests.length}</span>{" "}
-            yêu cầu
-          </div>
-
+        <div className="flex items-center justify-end p-4 border-t border-[#E2E8F0] bg-white">
           <div className="flex items-center gap-1">
             <button
               disabled={currentPage === 1}

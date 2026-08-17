@@ -34,6 +34,8 @@ export const INITIAL_ACCOUNTS: UserAccount[] = [
     shiftsCompleted: 152,
     rating: 4.8,
     skills: ["An ninh cơ bản", "Sơ cấp cứu", "Tiếng Anh giao tiếp", "Lái xe hạng B2"],
+    cvFileName: "CV_NguyenVanAn.pdf",
+    cvFileSize: "1.8 MB",
   },
   {
     id: "usr-2",
@@ -59,6 +61,8 @@ export const INITIAL_ACCOUNTS: UserAccount[] = [
     shiftsCompleted: 48,
     rating: 4.2,
     skills: ["Hỗ trợ văn phòng", "Tin học văn phòng"],
+    cvFileName: "CV_TranThiBinh_HoSo.pdf",
+    cvFileSize: "1.6 MB",
   },
   {
     id: "usr-3",
@@ -86,6 +90,10 @@ export const INITIAL_ACCOUNTS: UserAccount[] = [
     shiftsCompleted: 98,
     rating: 4.9,
     skills: ["Kỹ thuật mạng", "An ninh sự kiện", "Lái xe hạng B2"],
+    cvFileName: "CV_LeVanCuong_KyThuat.pdf",
+    cvFileSize: "2.1 MB",
+    notes:
+      "Cộng tác viên nhiệt tình, có chứng chỉ kỹ thuật máy tính và hỗ trợ trực ca sáng rất đúng giờ.",
   },
   {
     id: "usr-4",
@@ -113,6 +121,8 @@ export const INITIAL_ACCOUNTS: UserAccount[] = [
     shiftsCompleted: 210,
     rating: 5.0,
     skills: ["Quản lý nhóm", "Điều phối sự kiện", "Tiếng Anh giao tiếp"],
+    cvFileName: "CV_PhamThiDung_DieuPhoi.docx",
+    cvFileSize: "1.2 MB",
   },
 ];
 
@@ -122,7 +132,7 @@ export const INITIAL_REQUESTS: RegistrationRequest[] = [
     stt: 1,
     name: "Nguyễn Văn A",
     email: "nguyenvana@example.com",
-    phone: "0987654321",
+    phone: "098 765 4321",
     submittedAt: "15/10/2023 09:30",
     status: "Chờ duyệt",
     initials: "NT",
@@ -135,13 +145,15 @@ export const INITIAL_REQUESTS: RegistrationRequest[] = [
       "https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=600&q=80",
     cccdBack:
       "https://images.unsplash.com/photo-1586281380349-632531db7ed4?auto=format&fit=crop&w=600&q=80",
+    cvFileName: "CV_NguyenVanA_KyThuat.pdf",
+    cvFileSize: "1.4 MB",
   },
   {
     id: "req-2",
     stt: 2,
     name: "Trần Thị B",
     email: "tranthib@example.com",
-    phone: "0912345678",
+    phone: "091 234 5678",
     submittedAt: "14/10/2023 14:15",
     status: "Chờ duyệt",
     initials: "TB",
@@ -154,13 +166,15 @@ export const INITIAL_REQUESTS: RegistrationRequest[] = [
       "https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=600&q=80",
     cccdBack:
       "https://images.unsplash.com/photo-1586281380349-632531db7ed4?auto=format&fit=crop&w=600&q=80",
+    cvFileName: "CV_TranThiB_HanhChinh.docx",
+    cvFileSize: "820 KB",
   },
   {
     id: "req-3",
     stt: 3,
     name: "Đặng Quốc Huy",
     email: "dangquochuy@example.com",
-    phone: "0908889991",
+    phone: "090 888 9991",
     submittedAt: "12/10/2023 16:45",
     status: "Chờ duyệt",
     initials: "DH",
@@ -173,13 +187,15 @@ export const INITIAL_REQUESTS: RegistrationRequest[] = [
       "https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=600&q=80",
     cccdBack:
       "https://images.unsplash.com/photo-1586281380349-632531db7ed4?auto=format&fit=crop&w=600&q=80",
+    cvFileName: "CV_DangQuocHuy_AnToan.pdf",
+    cvFileSize: "2.1 MB",
   },
   {
     id: "req-4",
     stt: 4,
     name: "Vũ Thanh Hà",
     email: "vuthanhha@example.com",
-    phone: "0932221100",
+    phone: "093 222 1100",
     submittedAt: "10/10/2023 11:20",
     status: "Đã duyệt",
     initials: "VH",
@@ -190,13 +206,15 @@ export const INITIAL_REQUESTS: RegistrationRequest[] = [
       "https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=600&q=80",
     cccdBack:
       "https://images.unsplash.com/photo-1586281380349-632531db7ed4?auto=format&fit=crop&w=600&q=80",
+    cvFileName: "CV_VuThanhHa.pdf",
+    cvFileSize: "950 KB",
   },
   {
     id: "req-5",
     stt: 5,
     name: "Ngô Tấn Tài",
     email: "ngotantai@example.com",
-    phone: "0945556677",
+    phone: "094 555 6677",
     submittedAt: "08/10/2023 08:10",
     status: "Từ chối",
     initials: "NT",
@@ -207,6 +225,8 @@ export const INITIAL_REQUESTS: RegistrationRequest[] = [
       "https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=600&q=80",
     cccdBack:
       "https://images.unsplash.com/photo-1586281380349-632531db7ed4?auto=format&fit=crop&w=600&q=80",
+    cvFileName: "CV_NgoTanTai.docx",
+    cvFileSize: "640 KB",
   },
 ];
 
