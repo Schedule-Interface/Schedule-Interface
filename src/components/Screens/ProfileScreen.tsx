@@ -1,5 +1,6 @@
 import React, { useState, useRef } from "react";
-import { UserAccount, formatPhoneNumber } from "../../types";
+import { UserAccount } from "../../types";
+import { formatPhoneNumber } from "../../utils/formatters";
 
 interface ProfileScreenProps {
   user: UserAccount;

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { RegistrationRequest, formatPhoneNumber, formatDateOnly } from "../../types";
+import { RegistrationRequest } from "../../types";
+import { formatPhoneNumber, formatDateOnly } from "../../utils/formatters";
 import { RejectReasonModal } from "../Modals/RejectReasonModal";
 
 interface RequestsScreenProps {
@@ -18,7 +19,7 @@ export const RequestsScreen: React.FC<RequestsScreenProps> = ({
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [rejectingRequest, setRejectingRequest] = useState<RegistrationRequest | null>(null);
-  const itemsPerPage = 10;
+  const itemsPerPage = 5;
 
   // Filter requests (only show pending 'Chờ duyệt' requests)
   const filteredRequests = requests.filter((req) => {
@@ -47,8 +48,8 @@ export const RequestsScreen: React.FC<RequestsScreenProps> = ({
         <div>
           <h2 className="text-2xl font-bold text-[#1a1b1e] tracking-tight">Yêu cầu đăng ký</h2>
           <p className="text-sm text-[#44474e] mt-1">
-            Tổng số <span className="font-semibold text-[#1a1b1e]">{requests.length}</span> yêu cầu
-            đăng ký
+            Tổng số <span className="font-semibold text-[#1a1b1e]">{filteredRequests.length}</span>{" "}
+            yêu cầu đăng ký
           </p>
         </div>
       </div>
@@ -87,11 +88,11 @@ export const RequestsScreen: React.FC<RequestsScreenProps> = ({
       </div>
 
       {/* Data Table */}
-      <div className="bg-white border border-[#E2E8F0] rounded-lg overflow-hidden shadow-xs">
-        <div className="overflow-x-auto">
+      <div className="bg-white border border-[#E2E8F0] rounded-lg overflow-hidden shadow-xs flex flex-col">
+        <div className="overflow-x-auto overflow-y-hidden h-[395px]">
           <table className="w-full text-left border-collapse min-w-[800px]">
             <thead>
-              <tr className="bg-[#F8FAFC] border-b border-[#E2E8F0]">
+              <tr className="bg-[#F8FAFC] border-b border-[#E2E8F0] h-[45px]">
                 <th className="py-3 px-4 text-xs font-semibold text-[#44474e] uppercase tracking-wider w-16">
                   STT
                 </th>
@@ -109,7 +110,7 @@ export const RequestsScreen: React.FC<RequestsScreenProps> = ({
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#E2E8F0]">
+            <tbody>
               {currentItems.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="py-12 text-center text-[#74777f] text-sm">
@@ -120,7 +121,7 @@ export const RequestsScreen: React.FC<RequestsScreenProps> = ({
                 currentItems.map((req, index) => (
                   <tr
                     key={req.id}
-                    className="hover:bg-[#f4f3f7] transition-colors group cursor-default"
+                    className="hover:bg-[#f4f3f7] transition-colors group cursor-default h-[64px] border-b border-[#E2E8F0]"
                   >
                     <td className="py-3.5 px-4 text-sm text-[#44474e]">{startIndex + index + 1}</td>
                     <td className="py-3.5 px-4">
@@ -177,7 +178,7 @@ export const RequestsScreen: React.FC<RequestsScreenProps> = ({
         </div>
 
         {/* Pagination Footer */}
-        <div className="flex items-center justify-end p-4 border-t border-[#E2E8F0] bg-white">
+        <div className="flex items-center justify-end p-4 border-t border-[#E2E8F0] bg-white h-[61px]">
           <div className="flex items-center gap-1">
             <button
               disabled={currentPage === 1}

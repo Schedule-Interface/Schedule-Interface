@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import {
   UserAccount,
   UserRole,
@@ -9,39 +9,39 @@ import {
   NotificationItem,
   ViewTab,
   WorkRoom,
-  RoomStatus
-} from './types';
+  RoomStatus,
+} from "./types";
 import {
   INITIAL_ACCOUNTS,
   INITIAL_REQUESTS,
   INITIAL_SHIFTS,
   INITIAL_MEETINGS,
   INITIAL_NOTIFICATIONS,
-  INITIAL_ROOMS
-} from './data/initialData';
+  INITIAL_ROOMS,
+} from "./data/initialData";
 
-import { Sidebar } from './components/Navigation/Sidebar';
+import { Sidebar } from "./components/Navigation/Sidebar";
 
-import { LoginScreen } from './components/Screens/LoginScreen';
-import { AccountListScreen } from './components/Screens/AccountListScreen';
-import { ScheduleScreen } from './components/Screens/ScheduleScreen';
-import { SummaryScheduleScreen } from './components/Screens/SummaryScheduleScreen';
-import { RequestsScreen } from './components/Screens/RequestsScreen';
-import { ProfileScreen } from './components/Screens/ProfileScreen';
-import { RoomsScreen } from './components/Screens/RoomsScreen';
+import { LoginScreen } from "./components/Screens/LoginScreen";
+import { AccountListScreen } from "./components/Screens/AccountListScreen";
+import { ScheduleScreen } from "./components/Screens/ScheduleScreen";
+import { SummaryScheduleScreen } from "./components/Screens/SummaryScheduleScreen";
+import { RequestsScreen } from "./components/Screens/RequestsScreen";
+import { ProfileScreen } from "./components/Screens/ProfileScreen";
+import { RoomsScreen } from "./components/Screens/RoomsScreen";
 
-import { CreateUserModal } from './components/Modals/CreateUserModal';
-import { CreateMeetingModal } from './components/Modals/CreateMeetingModal';
-import { ViewRequestModal } from './components/Modals/ViewRequestModal';
-import { ViewAccountDetailModal } from './components/Modals/ViewAccountDetailModal';
-import { EditProfileModal } from './components/Modals/EditProfileModal';
-import { ChangePasswordModal } from './components/Modals/ChangePasswordModal';
-import { NotificationsPopover } from './components/Modals/NotificationsPopover';
-import { SettingsModal } from './components/Modals/SettingsModal';
-import { RejectReasonModal } from './components/Modals/RejectReasonModal';
-import { useSystemSettings } from './context/SystemSettingsContext';
+import { CreateUserModal } from "./components/Modals/CreateUserModal";
+import { CreateMeetingModal } from "./components/Modals/CreateMeetingModal";
+import { ViewRequestModal } from "./components/Modals/ViewRequestModal";
+import { ViewAccountDetailModal } from "./components/Modals/ViewAccountDetailModal";
+import { EditProfileModal } from "./components/Modals/EditProfileModal";
+import { ChangePasswordModal } from "./components/Modals/ChangePasswordModal";
+import { NotificationsPopover } from "./components/Modals/NotificationsPopover";
+import { SettingsModal } from "./components/Modals/SettingsModal";
+import { RejectReasonModal } from "./components/Modals/RejectReasonModal";
+import { useSystemSettings } from "./context/SystemSettingsContext";
 
-const SHIFTS_STORAGE_KEY = 'schedulo_shifts';
+const SHIFTS_STORAGE_KEY = "schedulo_shifts_v4";
 
 const loadStoredShifts = (): ShiftSlot[] => {
   try {
@@ -52,17 +52,19 @@ const loadStoredShifts = (): ShiftSlot[] => {
     if (!Array.isArray(parsed)) return INITIAL_SHIFTS;
 
     const isValid = parsed.every((item) => {
-      if (!item || typeof item !== 'object') return false;
+      if (!item || typeof item !== "object") return false;
       const shift = item as Partial<ShiftSlot>;
       return (
-        typeof shift.id === 'string' &&
-        typeof shift.dayIndex === 'number' &&
-        typeof shift.shiftType === 'string' &&
+        typeof shift.id === "string" &&
+        typeof shift.dayIndex === "number" &&
+        typeof shift.shiftType === "string" &&
         Array.isArray(shift.assignedCTVs)
       );
     });
 
-    const hasFullPastShifts = (parsed as ShiftSlot[]).some((item) => item.id === 'past-2026-07-28-m');
+    const hasFullPastShifts = (parsed as ShiftSlot[]).some(
+      (item) => item.id === "past-2026-07-28-m",
+    );
     if (!hasFullPastShifts) {
       return INITIAL_SHIFTS;
     }
@@ -80,10 +82,10 @@ export const App: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(true);
 
   // Active view tab
-  const [currentTab, setCurrentTab] = useState<ViewTab>('accounts');
+  const [currentTab, setCurrentTab] = useState<ViewTab>("accounts");
 
   // Search query from TopBar
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Mobile sidebar state
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -100,7 +102,11 @@ export const App: React.FC = () => {
   const [rooms, setRooms] = useState<WorkRoom[]>(INITIAL_ROOMS);
 
   // Workroom Operations
-  const handleAddRoom = (newRoomData: { name: string; descriptionAndLocation: string; status: RoomStatus }) => {
+  const handleAddRoom = (newRoomData: {
+    name: string;
+    descriptionAndLocation: string;
+    status: RoomStatus;
+  }) => {
     const newRoom: WorkRoom = {
       id: `room-${Date.now()}`,
       ...newRoomData,
@@ -120,12 +126,12 @@ export const App: React.FC = () => {
     setRooms((prev) =>
       prev.map((r) => {
         if (r.id === id) {
-          const nextStatus: RoomStatus = r.status === 'Hoạt động' ? 'Bảo trì' : 'Hoạt động';
+          const nextStatus: RoomStatus = r.status === "Hoạt động" ? "Bảo trì" : "Hoạt động";
           showToast(`Đã chuyển trạng thái ${r.name} sang "${nextStatus}"`);
           return { ...r, status: nextStatus };
         }
         return r;
-      })
+      }),
     );
   };
 
@@ -136,7 +142,9 @@ export const App: React.FC = () => {
   const [isCreateUserOpen, setIsCreateUserOpen] = useState(false);
   const [isCreateMeetingOpen, setIsCreateMeetingOpen] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState<RegistrationRequest | null>(null);
-  const [rejectingRequestModal, setRejectingRequestModal] = useState<RegistrationRequest | null>(null);
+  const [rejectingRequestModal, setRejectingRequestModal] = useState<RegistrationRequest | null>(
+    null,
+  );
   const [selectedAccountDetail, setSelectedAccountDetail] = useState<UserAccount | null>(null);
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
@@ -165,7 +173,7 @@ export const App: React.FC = () => {
 
   const handleLogout = () => {
     setIsLoggedIn(false);
-    showToast('Đã đăng xuất khỏi hệ thống');
+    showToast("Đã đăng xuất khỏi hệ thống");
   };
 
   // Account Operations
@@ -181,16 +189,16 @@ export const App: React.FC = () => {
       stt: accounts.length + 1,
       name: userData.name,
       email: userData.email,
-      phone: userData.phone || '090 000 0000',
+      phone: userData.phone || "090 000 0000",
       role: userData.role,
-      status: 'Kích hoạt',
-      registerDate: new Date().toLocaleDateString('vi-VN'),
+      status: "Kích hoạt",
+      registerDate: new Date().toLocaleDateString("vi-VN"),
       address: userData.address,
       initials: userData.name.substring(0, 2).toUpperCase(),
       cctvCode: `CTV-2023-${Math.floor(100 + Math.random() * 900)}`,
-      joinDate: new Date().toLocaleDateString('vi-VN'),
+      joinDate: new Date().toLocaleDateString("vi-VN"),
       shiftsCompleted: 0,
-      rating: 5.0
+      rating: 5.0,
     };
     setAccounts([newAcc, ...accounts]);
     showToast(`Đã tạo tài khoản thành công cho ${userData.name}`);
@@ -200,9 +208,8 @@ export const App: React.FC = () => {
     setAccounts((prev) =>
       prev.map((acc) => {
         if (acc.id === id) {
-          const newStatus =
-            acc.status === 'Kích hoạt' ? 'Vô hiệu hóa' : 'Kích hoạt';
-          if (newStatus === 'Vô hiệu hóa') {
+          const newStatus = acc.status === "Kích hoạt" ? "Vô hiệu hóa" : "Kích hoạt";
+          if (newStatus === "Vô hiệu hóa") {
             // Automatically cancel future shift registrations for this CTV while keeping 1 month past history
             setShifts((prevShifts) =>
               prevShifts.map((shift) => {
@@ -213,10 +220,10 @@ export const App: React.FC = () => {
                   };
                 }
                 return shift;
-              })
+              }),
             );
             showToast(
-              `Đã khóa tài khoản ${acc.name}. Giữ nguyên lịch 1 tháng quá khứ và tự động hủy ca đăng ký 2 tháng tương lai để giải phóng chỗ.`
+              `Đã khóa tài khoản ${acc.name}. Giữ nguyên lịch 1 tháng quá khứ và tự động hủy ca đăng ký 2 tháng tương lai để giải phóng chỗ.`,
             );
           } else {
             showToast(`Đã kích hoạt lại tài khoản ${acc.name}`);
@@ -224,7 +231,7 @@ export const App: React.FC = () => {
           return { ...acc, status: newStatus };
         }
         return acc;
-      })
+      }),
     );
   };
 
@@ -244,7 +251,7 @@ export const App: React.FC = () => {
           return { ...acc, role: newRole };
         }
         return acc;
-      })
+      }),
     );
   };
 
@@ -255,7 +262,7 @@ export const App: React.FC = () => {
           return { ...acc, notes };
         }
         return acc;
-      })
+      }),
     );
     setSelectedAccountDetail((prev) => (prev && prev.id === id ? { ...prev, notes } : prev));
     showToast("Đã lưu ghi chú quản trị viên thành công");
@@ -265,7 +272,7 @@ export const App: React.FC = () => {
     accountId: string,
     startDate: string,
     endDate: string,
-    reason: string
+    reason: string,
   ) => {
     const targetAcc = accounts.find((a) => a.id === accountId);
     const accName = targetAcc?.name || "CTV";
@@ -274,7 +281,7 @@ export const App: React.FC = () => {
     setShifts((prevShifts) =>
       prevShifts.map((shift) => {
         const isAssigned = (shift.assignedCTVs || []).some(
-          (c) => c.id === accountId || c.name === accName
+          (c) => c.id === accountId || c.name === accName,
         );
         if (!isAssigned) return shift;
 
@@ -283,12 +290,12 @@ export const App: React.FC = () => {
           return {
             ...shift,
             assignedCTVs: (shift.assignedCTVs || []).filter(
-              (c) => c.id !== accountId && c.name !== accName
+              (c) => c.id !== accountId && c.name !== accName,
             ),
           };
         }
         return shift;
-      })
+      }),
     );
 
     // Update account note with end schedule record
@@ -302,7 +309,7 @@ export const App: React.FC = () => {
           return { ...acc, notes: newNotes };
         }
         return acc;
-      })
+      }),
     );
 
     setSelectedAccountDetail((prev) => {
@@ -314,7 +321,7 @@ export const App: React.FC = () => {
     });
 
     showToast(
-      `Đã kết thúc lịch làm việc của ${accName} từ ${endDate}. Các ca sau ngày này đã được hủy bỏ.`
+      `Đã kết thúc lịch làm việc của ${accName} từ ${endDate}. Các ca sau ngày này đã được hủy bỏ.`,
     );
   };
 
@@ -333,12 +340,12 @@ export const App: React.FC = () => {
       name: req.name,
       email: req.email,
       phone: req.phone,
-      role: 'Cộng tác viên',
-      status: 'Kích hoạt',
-      registerDate: req.submittedAt.split(' ')[0],
+      role: "Cộng tác viên",
+      status: "Kích hoạt",
+      registerDate: req.submittedAt.split(" ")[0],
       initials: req.initials,
       cctvCode: `CTV-2026-${Math.floor(100 + Math.random() * 900)}`,
-      joinDate: new Date().toLocaleDateString('vi-VN'),
+      joinDate: new Date().toLocaleDateString("vi-VN"),
       shiftsCompleted: 0,
       rating: 5.0,
       dob: req.dob,
@@ -367,12 +374,12 @@ export const App: React.FC = () => {
       name: req.name,
       email: req.email,
       phone: req.phone,
-      role: 'Cộng tác viên',
-      status: 'Vô hiệu hóa',
-      registerDate: req.submittedAt.split(' ')[0],
+      role: "Cộng tác viên",
+      status: "Vô hiệu hóa",
+      registerDate: req.submittedAt.split(" ")[0],
       initials: req.initials,
       cctvCode: `CTV-2026-${Math.floor(100 + Math.random() * 900)}`,
-      joinDate: new Date().toLocaleDateString('vi-VN'),
+      joinDate: new Date().toLocaleDateString("vi-VN"),
       shiftsCompleted: 0,
       rating: 5.0,
       dob: req.dob,
@@ -393,17 +400,13 @@ export const App: React.FC = () => {
 
   // Shift Operations
   const handleRegisterShift = (shiftId: string) => {
-    setShifts((prev) =>
-      prev.map((s) => (s.id === shiftId ? { ...s, status: 'Đã đăng ký' } : s))
-    );
-    showToast('Đăng ký ca làm thành công!');
+    setShifts((prev) => prev.map((s) => (s.id === shiftId ? { ...s, status: "Đã đăng ký" } : s)));
+    showToast("Đăng ký ca làm thành công!");
   };
 
   const handleCancelShift = (shiftId: string) => {
-    setShifts((prev) =>
-      prev.map((s) => (s.id === shiftId ? { ...s, status: 'Chưa đăng ký' } : s))
-    );
-    showToast('Đã hủy đăng ký ca làm.');
+    setShifts((prev) => prev.map((s) => (s.id === shiftId ? { ...s, status: "Chưa đăng ký" } : s)));
+    showToast("Đã hủy đăng ký ca làm.");
   };
 
   // Meeting Operations
@@ -421,39 +424,39 @@ export const App: React.FC = () => {
       id: `meet-${Date.now()}`,
       title: meetingData.title,
       dateDisplay: meetingData.dateDisplay,
-      dateKey: '2023-10-19',
+      dateKey: "2023-10-19",
       dayIndex: 3,
-      startTime: meetingData.startTime || '09:00',
+      startTime: meetingData.startTime || "09:00",
       timeRange: meetingData.timeRange || meetingData.startTime,
       location: meetingData.location,
       organizer: currentUser.name,
-      status: 'Sắp diễn ra',
-      statusColor: 'info',
+      status: "Sắp diễn ra",
+      statusColor: "info",
       isOnline: meetingData.isOnline,
       description: meetingData.description
         ? [meetingData.description]
-        : ['Chưa có mô tả chi tiết.'],
+        : ["Chưa có mô tả chi tiết."],
       participants:
         meetingData.participants && meetingData.participants.length > 0
           ? meetingData.participants
           : [
               {
-                id: 'p-user',
+                id: "p-user",
                 name: currentUser.name,
                 role: currentUser.role,
                 avatar: currentUser.avatar,
-                status: 'confirmed'
-              }
-            ]
+                status: "confirmed",
+              },
+            ],
     };
 
     setMeetings([newMeeting, ...meetings]);
-    showToast('Đã tạo phiên họp mới thành công!');
+    showToast("Đã tạo phiên họp mới thành công!");
   };
 
   const handleCancelMeeting = (meetingId: string) => {
     setMeetings((prev) => prev.filter((m) => m.id !== meetingId));
-    showToast('Đã hủy cuộc họp thành công.');
+    showToast("Đã hủy cuộc họp thành công.");
   };
 
   const handleSendNotification = (meetingId: string) => {
@@ -470,21 +473,24 @@ export const App: React.FC = () => {
 
   const handleSaveProfile = (updated: Partial<UserAccount>) => {
     setCurrentUser({ ...currentUser, ...updated });
-    showToast('Đã cập nhật thông tin hồ sơ cá nhân.');
+    showToast("Đã cập nhật thông tin hồ sơ cá nhân.");
   };
 
   // Pending count for sidebar badge
   const handleSwitchRole = (newRole: UserRole) => {
     setCurrentUser((prev) => ({ ...prev, role: newRole }));
     showToast(`Đã chuyển sang giao diện: ${newRole}`);
-    if (newRole === 'Cộng tác viên' && (currentTab === 'accounts' || currentTab === 'requests' || currentTab === 'meetings')) {
-      setCurrentTab('schedule');
-    } else if (newRole === 'Admin' && currentTab === 'schedule') {
-      setCurrentTab('accounts');
+    if (
+      newRole === "Cộng tác viên" &&
+      (currentTab === "accounts" || currentTab === "requests" || currentTab === "meetings")
+    ) {
+      setCurrentTab("schedule");
+    } else if (newRole === "Admin" && currentTab === "schedule") {
+      setCurrentTab("accounts");
     }
   };
 
-  const pendingRequestsCount = requests.filter((r) => r.status === 'Chờ duyệt').length;
+  const pendingRequestsCount = requests.filter((r) => r.status === "Chờ duyệt").length;
   const unreadNotifCount = notifications.filter((n) => !n.read).length;
 
   if (!isLoggedIn) {
@@ -495,21 +501,23 @@ export const App: React.FC = () => {
           setRequests((prev) => [newRequest, ...prev]);
           const newNotif: NotificationItem = {
             id: `notif-${Date.now()}`,
-            title: 'Yêu cầu đăng ký mới',
+            title: "Yêu cầu đăng ký mới",
             message: `${newRequest.name} vừa gửi hồ sơ ứng tuyển CTV (có đính kèm CCCD & CV).`,
-            time: 'Vừa xong',
-            type: 'info',
+            time: "Vừa xong",
+            type: "info",
             read: false,
           };
           setNotifications((prev) => [newNotif, ...prev]);
         }}
-        onForgotPassword={() => alert('Vui lòng liên hệ Quản trị viên để đặt lại mật khẩu.')}
+        onForgotPassword={() => alert("Vui lòng liên hệ Quản trị viên để đặt lại mật khẩu.")}
       />
     );
   }
 
   return (
-    <div className={`h-screen flex overflow-hidden bg-[#faf9fd] text-[#1a1b1e] ${isDarkMode ? 'dark' : ''}`}>
+    <div
+      className={`h-screen flex overflow-hidden bg-[#faf9fd] text-[#1a1b1e] ${isDarkMode ? "dark" : ""}`}
+    >
       {/* Toast Notification Banner */}
       {toastMessage && (
         <div className="fixed bottom-6 right-6 z-50 bg-[#002046] text-white text-xs font-semibold px-4 py-3 rounded-lg shadow-xl flex items-center gap-2 animate-in slide-in-from-bottom-3 duration-200">
@@ -571,7 +579,7 @@ export const App: React.FC = () => {
       {/* Main Content Area */}
       <div
         className={`flex-1 flex flex-col h-screen min-w-0 overflow-hidden relative transition-all duration-300 ease-in-out ${
-          isSidebarCollapsed ? 'md:ml-[72px]' : 'md:ml-[280px]'
+          isSidebarCollapsed ? "md:ml-[72px]" : "md:ml-[280px]"
         }`}
       >
         {/* Mobile-Only Bar */}
@@ -602,18 +610,18 @@ export const App: React.FC = () => {
           notifications={notifications}
           onMarkAllAsRead={() => {
             setNotifications(notifications.map((n) => ({ ...n, read: true })));
-            showToast('Đã đánh dấu tất cả thông báo là đã đọc');
+            showToast("Đã đánh dấu tất cả thông báo là đã đọc");
           }}
           onClearNotifications={() => {
             setNotifications([]);
-            showToast('Đã xóa tất cả thông báo');
+            showToast("Đã xóa tất cả thông báo");
           }}
         />
 
         {/* Dynamic Page Views */}
         <main className="flex-1 overflow-y-auto p-4 md:p-8">
           <div className="max-w-7xl w-full mx-auto">
-            {currentTab === 'accounts' && (
+            {currentTab === "accounts" && (
               <AccountListScreen
                 accounts={accounts}
                 onCreateAccount={() => setIsCreateUserOpen(true)}
@@ -624,7 +632,7 @@ export const App: React.FC = () => {
               />
             )}
 
-            {currentTab === 'requests' && (
+            {currentTab === "requests" && (
               <RequestsScreen
                 requests={requests}
                 onApproveRequest={handleApproveRequest}
@@ -633,7 +641,7 @@ export const App: React.FC = () => {
               />
             )}
 
-            {currentTab === 'schedule' && (
+            {currentTab === "schedule" && (
               <ScheduleScreen
                 shifts={shifts}
                 accounts={accounts}
@@ -645,7 +653,7 @@ export const App: React.FC = () => {
               />
             )}
 
-            {currentTab === 'meetings' && (
+            {currentTab === "meetings" && (
               <SummaryScheduleScreen
                 shifts={shifts}
                 accounts={accounts}
@@ -656,7 +664,7 @@ export const App: React.FC = () => {
               />
             )}
 
-            {currentTab === 'rooms' && (
+            {currentTab === "rooms" && (
               <RoomsScreen
                 rooms={rooms}
                 onAddRoom={handleAddRoom}
@@ -667,7 +675,7 @@ export const App: React.FC = () => {
               />
             )}
 
-            {currentTab === 'profile' && (
+            {currentTab === "profile" && (
               <ProfileScreen
                 user={currentUser}
                 onOpenEditProfile={() => setIsEditProfileOpen(true)}
@@ -675,25 +683,25 @@ export const App: React.FC = () => {
                 onUpdateAvatar={(newAvatar) => {
                   handleSaveProfile({ avatar: newAvatar });
                   if (!newAvatar) {
-                    showToast('Đã xóa ảnh đại diện');
+                    showToast("Đã xóa ảnh đại diện");
                   } else {
-                    showToast('Đã thay đổi ảnh đại diện thành công');
+                    showToast("Đã thay đổi ảnh đại diện thành công");
                   }
                 }}
                 onUpdateCccdFront={(url) => {
                   handleSaveProfile({ cccdFront: url });
                   if (!url) {
-                    showToast('Đã xóa ảnh CCCD mặt trước');
+                    showToast("Đã xóa ảnh CCCD mặt trước");
                   } else {
-                    showToast('Đã thay đổi ảnh CCCD mặt trước thành công');
+                    showToast("Đã thay đổi ảnh CCCD mặt trước thành công");
                   }
                 }}
                 onUpdateCccdBack={(url) => {
                   handleSaveProfile({ cccdBack: url });
                   if (!url) {
-                    showToast('Đã xóa ảnh CCCD mặt sau');
+                    showToast("Đã xóa ảnh CCCD mặt sau");
                   } else {
-                    showToast('Đã thay đổi ảnh CCCD mặt sau thành công');
+                    showToast("Đã thay đổi ảnh CCCD mặt sau thành công");
                   }
                 }}
               />
@@ -759,14 +767,10 @@ export const App: React.FC = () => {
       <ChangePasswordModal
         isOpen={isChangePasswordOpen}
         onClose={() => setIsChangePasswordOpen(false)}
-        onSuccess={() => showToast('Đổi mật khẩu thành công!')}
+        onSuccess={() => showToast("Đổi mật khẩu thành công!")}
       />
 
-      <SettingsModal
-        isOpen={isSettingsOpen}
-        onClose={() => setIsSettingsOpen(false)}
-      />
-
+      <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
     </div>
   );
 };

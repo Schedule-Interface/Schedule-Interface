@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { RegistrationRequest, formatPhoneNumber, formatDateOnly } from "../../types";
+import { RegistrationRequest } from "../../types";
+import { formatPhoneNumber, formatDateOnly } from "../../utils/formatters";
 
 interface ViewRequestModalProps {
   request: RegistrationRequest | null;
@@ -80,9 +81,6 @@ export const ViewRequestModal: React.FC<ViewRequestModalProps> = ({
                 <span className="material-symbols-outlined text-[16px]">badge</span>
                 <span>Ảnh chụp CCCD (Mặt trước & Mặt sau)</span>
               </span>
-              <span className="text-[10px] text-slate-500 font-medium">
-                Nhấn vào ảnh để phóng to
-              </span>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div
@@ -149,9 +147,6 @@ export const ViewRequestModal: React.FC<ViewRequestModalProps> = ({
                   <div className="min-w-0">
                     <p className="text-xs font-bold text-[#1a1b1e] truncate">
                       {request.cvFileName || "Ho_so_CV.pdf"}
-                    </p>
-                    <p className="text-[10px] text-slate-500 font-medium">
-                      {request.cvFileSize || "1.2 MB"} • Hồ sơ đính kèm
                     </p>
                   </div>
                 </div>
