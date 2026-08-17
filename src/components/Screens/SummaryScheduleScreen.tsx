@@ -69,12 +69,6 @@ export const SummaryScheduleScreen: React.FC<SummaryScheduleScreenProps> = ({
     }
   };
 
-  const handleTodayMonth = () => {
-    const todayObj = new Date();
-    setSelectedYear(todayObj.getFullYear());
-    setSelectedMonth(todayObj.getMonth());
-  };
-
   const getAssignedCTVs = (workDate: string, type: "morning" | "afternoon") =>
     getAssignedCTVsForDate(shifts, accounts, workDate, type);
 
@@ -242,48 +236,11 @@ export const SummaryScheduleScreen: React.FC<SummaryScheduleScreenProps> = ({
     });
   };
 
-  const handleExport = () => {
-    if (onShowToast) {
-      onShowToast(
-        `Đã xuất báo cáo lịch làm việc ${monthNames[selectedMonth]}, ${selectedYear} thành công!`,
-      );
-    }
-  };
-
   return (
     <div className="space-y-6 animate-in fade-in duration-200">
-      {/* Top Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-[#25262b] p-6 rounded-2xl border border-[#E2E8F0] dark:border-[#3b3d45] shadow-xs">
-        <div>
-          <h2 className="text-2xl font-bold text-[#1a1b1e] dark:text-slate-100 tracking-tight">
-            Lịch làm việc tổng hợp
-          </h2>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-            Quản lý và theo dõi phân công lịch làm việc CTV theo tháng
-          </p>
-        </div>
-
-        {/* Action Controls */}
-        <div className="flex flex-wrap items-center gap-3">
-          <button
-            type="button"
-            onClick={handleTodayMonth}
-            className="px-3.5 py-2 rounded-xl bg-blue-50 dark:bg-blue-950/60 hover:bg-blue-100 dark:hover:bg-blue-900/80 text-accent dark:text-blue-300 border border-blue-200 dark:border-blue-800/80 text-xs font-bold transition-all shadow-2xs cursor-pointer flex items-center gap-1.5"
-          >
-            <span className="material-symbols-outlined text-[16px]">today</span>
-            <span>Hôm nay</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={handleExport}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl border border-[#E2E8F0] dark:border-[#3b3d45] hover:bg-slate-50 dark:hover:bg-[#2c2d33] text-xs font-bold text-[#1a1b1e] dark:text-slate-200 transition-colors shadow-2xs cursor-pointer"
-          >
-            <span className="material-symbols-outlined text-[18px]">download</span>
-            <span>Xuất lịch làm việc</span>
-          </button>
-        </div>
-      </div>
+      <h2 className="text-2xl font-bold text-[#1a1b1e] dark:text-slate-100 tracking-tight">
+        Lịch làm việc tổng hợp
+      </h2>
 
       {/* Danh sách CTV đăng ký hôm nay (Giữ nguyên khối trên cùng) */}
       <div className="bg-white dark:bg-[#25262b] border border-[#E2E8F0] dark:border-[#3b3d45] rounded-2xl p-5 shadow-xs space-y-4">

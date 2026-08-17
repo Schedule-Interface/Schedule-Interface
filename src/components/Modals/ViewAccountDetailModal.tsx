@@ -157,6 +157,7 @@ export const ViewAccountDetailModal: React.FC<ViewAccountDetailModalProps> = ({
   };
 
   const todayISO = toISODate(new Date());
+  const todayWeekdayIndex = (new Date().getDay() + 6) % 7;
 
   const changeHistoryMonth = (amount: number) => {
     setHistoryDate((current) => new Date(current.getFullYear(), current.getMonth() + amount, 1));
@@ -325,7 +326,7 @@ LỊCH SỬ HOẠT ĐỘNG:
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-xs z-50 flex items-center justify-center p-4 overflow-y-auto">
-      <div className="bg-white dark:bg-[#25262b] rounded-2xl border border-[#E2E8F0] dark:border-[#3b3d45] shadow-2xl w-full max-w-2xl overflow-hidden my-auto animate-in fade-in zoom-in-95 duration-150">
+      <div className="bg-white dark:bg-[#25262b] rounded-2xl border border-[#E2E8F0] dark:border-[#3b3d45] shadow-2xl w-full max-w-3xl overflow-hidden my-auto animate-in fade-in zoom-in-95 duration-150">
         {/* Modal Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-[#E2E8F0] dark:border-[#3b3d45] bg-[#F8FAFC] dark:bg-[#1f2023]">
           <div className="flex items-center gap-2.5">
@@ -499,40 +500,59 @@ LỊCH SỬ HOẠT ĐỘNG:
                 </div>
 
                 <div className="flex items-center gap-1.5 shrink-0">
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setPreviewDoc({
-                        fileName: cvFileName,
-                        fileSize: cvFileSize,
-                        isPdf,
-                      })
-                    }
-                    className="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-[11px] font-bold rounded-lg transition-colors flex items-center gap-1 shadow-2xs cursor-pointer border border-slate-200 dark:border-slate-700"
-                  >
-                    <span className="material-symbols-outlined text-[15px]">visibility</span>
-                    <span>Xem file</span>
-                  </button>
+                  <div className="relative group">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setPreviewDoc({
+                          fileName: cvFileName,
+                          fileSize: cvFileSize,
+                          isPdf,
+                        })
+                      }
+                      aria-label="Xem file"
+                      className="w-9 h-9 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg transition-colors flex items-center justify-center shadow-2xs cursor-pointer border border-slate-200 dark:border-slate-700"
+                    >
+                      <span className="material-symbols-outlined text-[18px]">visibility</span>
+                    </button>
+                    <span
+                      role="tooltip"
+                      className="pointer-events-none absolute right-0 top-full z-20 mt-2 whitespace-nowrap rounded-lg bg-slate-900 px-2.5 py-1.5 text-[11px] font-semibold text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100 group-focus-within:opacity-100 dark:bg-slate-100 dark:text-slate-900"
+                    >
+                      Xem file
+                    </span>
+                  </div>
 
-                  <button
-                    type="button"
-                    onClick={handleDownloadCV}
-                    className="px-2.5 py-1.5 bg-[#1b365d] hover:bg-[#002046] dark:bg-indigo-600 dark:hover:bg-indigo-700 text-white text-[11px] font-bold rounded-lg transition-colors flex items-center gap-1 shadow-2xs cursor-pointer"
-                  >
-                    <span className="material-symbols-outlined text-[15px]">download</span>
-                    <span>Tải về</span>
-                  </button>
+                  <div className="relative group">
+                    <button
+                      type="button"
+                      onClick={handleDownloadCV}
+                      aria-label="Tải về"
+                      className="w-9 h-9 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg transition-colors flex items-center justify-center shadow-2xs cursor-pointer border border-slate-200 dark:border-slate-700"
+                    >
+                      <span className="material-symbols-outlined text-[18px]">download</span>
+                    </button>
+                    <span
+                      role="tooltip"
+                      className="pointer-events-none absolute right-0 top-full z-20 mt-2 whitespace-nowrap rounded-lg bg-slate-900 px-2.5 py-1.5 text-[11px] font-semibold text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100 group-focus-within:opacity-100 dark:bg-slate-100 dark:text-slate-900"
+                    >
+                      Tải về
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Section 2: Monday - Friday Schedule (Ca sáng & Ca chiều) */}
-          <div>
-            <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
-              <h5 className="text-xs font-bold text-[#1b365d] dark:text-[#d6e3ff] uppercase tracking-wider flex items-center gap-1.5">
-                <span className="material-symbols-outlined text-[16px] text-indigo-600">
-                  calendar_month
+          <div className="space-y-3">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3 dark:border-slate-800">
+              <h5 className="flex items-center gap-2 text-base font-bold text-slate-900 dark:text-slate-100">
+                <span
+                  className="material-symbols-outlined text-[22px] text-blue-700 dark:text-blue-300"
+                  aria-hidden="true"
+                >
+                  calendar_view_week
                 </span>
                 <span>Lịch trình làm việc</span>
               </h5>
@@ -551,14 +571,22 @@ LỊCH SỬ HOẠT ĐỘNG:
                     </span>
                   </div>
                 )}
-                <button
-                  type="button"
-                  onClick={() => setShowWorkHistory(true)}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 dark:bg-indigo-950/50 dark:text-indigo-300 dark:border-indigo-800/80 transition-colors cursor-pointer shadow-2xs"
-                >
-                  <span className="material-symbols-outlined text-[15px]">history</span>
-                  <span>Lịch sử làm việc</span>
-                </button>
+                <div className="group relative">
+                  <button
+                    type="button"
+                    onClick={() => setShowWorkHistory(true)}
+                    aria-label="Lịch sử làm việc"
+                    className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg border border-slate-200 bg-slate-100 text-slate-700 shadow-2xs transition-colors hover:bg-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
+                  >
+                    <span className="material-symbols-outlined text-[18px]">history</span>
+                  </button>
+                  <span
+                    role="tooltip"
+                    className="pointer-events-none absolute right-0 top-full z-20 mt-2 whitespace-nowrap rounded-lg bg-slate-900 px-2.5 py-1.5 text-[11px] font-semibold text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100 group-focus-within:opacity-100 dark:bg-slate-100 dark:text-slate-900"
+                  >
+                    Lịch sử làm việc
+                  </span>
+                </div>
               </div>
             </div>
 
@@ -568,82 +596,98 @@ LỊCH SỬ HOẠT ĐỘNG:
                 <span>Tài khoản Quản trị viên (Admin) không tham gia đăng ký lịch làm việc.</span>
               </div>
             ) : (
-              <>
-                {/* 5-Day Grid */}
-                <div className="grid grid-cols-5 gap-2">
-                  {WEEKDAYS.map((day) => {
-                    const morning = getShiftStatus(day.index, "morning");
-                    const afternoon = getShiftStatus(day.index, "afternoon");
+              <div className="overflow-x-auto pb-1">
+                <div className="min-w-[650px] space-y-3">
+                  <div className="grid grid-cols-5 gap-3">
+                    {WEEKDAYS.map((day) => {
+                      const isToday = day.index === todayWeekdayIndex;
 
-                    return (
-                      <div
-                        key={day.index}
-                        className="bg-[#F8FAFC] dark:bg-[#1e1f23] border border-[#E2E8F0] dark:border-[#3b3d45] rounded-xl overflow-hidden flex flex-col"
-                      >
-                        {/* Day Header */}
-                        <div className="p-2 bg-[#1b365d]/5 dark:bg-[#1b365d]/20 border-b border-[#E2E8F0] dark:border-[#3b3d45] text-center">
-                          <p className="font-bold text-xs text-[#1b365d] dark:text-[#d6e3ff]">
-                            {day.dayName}
-                          </p>
+                      return (
+                        <div
+                          key={day.index}
+                          className={`flex items-center justify-center gap-1.5 rounded-xl py-2 text-center text-xs font-bold uppercase tracking-wider transition-colors ${
+                            isToday
+                              ? "bg-blue-50 text-blue-700 dark:bg-blue-950/50 dark:text-blue-300"
+                              : "bg-slate-100/90 text-slate-700 dark:bg-slate-800 dark:text-slate-200"
+                          }`}
+                        >
+                          <span>{day.dayName}</span>
+                          {isToday && (
+                            <span className="rounded-md bg-blue-600 px-1.5 py-0.5 text-[10px] font-bold normal-case tracking-normal text-white">
+                              Hôm nay
+                            </span>
+                          )}
                         </div>
+                      );
+                    })}
+                  </div>
 
-                        {/* Shifts for this Day */}
-                        <div className="flex flex-col">
-                          {/* Morning slot (Top) */}
-                          <div className="p-2 min-h-[48px] flex items-center justify-center border-b border-[#E2E8F0] dark:border-[#3b3d45]">
-                            {morning === "working" ? (
+                  <div className="grid grid-cols-5 gap-3">
+                    {WEEKDAYS.map((day) => {
+                      const morning = getShiftStatus(day.index, "morning");
+                      const afternoon = getShiftStatus(day.index, "afternoon");
+                      const isToday = day.index === todayWeekdayIndex;
+
+                      return (
+                        <div
+                          key={day.index}
+                          className={`min-h-[104px] rounded-2xl border-2 bg-white p-3 shadow-2xs transition-colors dark:bg-slate-900 ${
+                            isToday
+                              ? "border-blue-600 dark:border-blue-400"
+                              : "border-slate-200 dark:border-slate-800"
+                          }`}
+                        >
+                          <div className="space-y-2">
+                            {morning !== "off" ? (
                               <div
-                                title="Ca sáng: Đi làm"
-                                className="w-full h-8 flex items-center justify-center rounded-lg bg-amber-50 text-amber-800 border border-amber-300 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800 shadow-2xs"
+                                title={morning === "pending" ? "Ca sáng: Chờ duyệt" : "Ca sáng: Đi làm"}
+                                className={`flex w-full items-center gap-2 whitespace-nowrap rounded-xl border px-3 py-2 text-xs font-bold shadow-xs ${
+                                  morning === "pending"
+                                    ? "border-amber-300 bg-amber-100 text-amber-900 dark:border-amber-700 dark:bg-amber-900/50 dark:text-amber-100"
+                                    : "border-amber-200/90 bg-amber-50 text-amber-900 dark:border-amber-800/50 dark:bg-amber-950/40 dark:text-amber-200"
+                                }`}
                               >
-                                <span className="material-symbols-outlined text-[20px]">
+                                <span
+                                  className="material-symbols-outlined text-[18px] text-amber-700 dark:text-amber-400"
+                                  aria-hidden="true"
+                                >
                                   wb_sunny
                                 </span>
+                                <span>Ca Sáng</span>
                               </div>
-                            ) : morning === "pending" ? (
-                              <div
-                                title="Ca sáng: Chờ duyệt"
-                                className="w-full h-8 flex items-center justify-center rounded-lg bg-amber-100 text-amber-900 border border-amber-400 dark:bg-amber-900/50 dark:text-amber-200 shadow-2xs"
-                              >
-                                <span className="material-symbols-outlined text-[20px]">
-                                  wb_sunny
-                                </span>
-                              </div>
-                            ) : (
-                              <div className="w-full h-8" />
-                            )}
-                          </div>
+                            ) : afternoon !== "off" ? (
+                              <div className="h-[38px]" aria-hidden="true" />
+                            ) : null}
 
-                          {/* Afternoon slot (Bottom) */}
-                          <div className="p-2 min-h-[48px] flex items-center justify-center">
-                            {afternoon === "working" ? (
+                            {afternoon !== "off" && (
                               <div
-                                title="Ca chiều: Đi làm"
-                                className="w-full h-8 flex items-center justify-center rounded-lg bg-purple-50 text-purple-800 border border-purple-300 dark:bg-purple-950/60 dark:text-purple-300 dark:border-purple-800 shadow-2xs"
+                                title={
+                                  afternoon === "pending"
+                                    ? "Ca chiều: Chờ duyệt"
+                                    : "Ca chiều: Đi làm"
+                                }
+                                className={`flex w-full items-center gap-2 whitespace-nowrap rounded-xl border px-3 py-2 text-xs font-bold shadow-xs ${
+                                  afternoon === "pending"
+                                    ? "border-purple-300 bg-purple-100 text-purple-900 dark:border-purple-700 dark:bg-purple-900/50 dark:text-purple-100"
+                                    : "border-purple-200/90 bg-purple-50 text-purple-900 dark:border-purple-800/50 dark:bg-purple-950/40 dark:text-purple-200"
+                                }`}
                               >
-                                <span className="material-symbols-outlined text-[20px]">
+                                <span
+                                  className="material-symbols-outlined text-[18px] text-purple-700 dark:text-purple-400"
+                                  aria-hidden="true"
+                                >
                                   wb_twilight
                                 </span>
+                                <span>Ca Chiều</span>
                               </div>
-                            ) : afternoon === "pending" ? (
-                              <div
-                                title="Ca chiều: Chờ duyệt"
-                                className="w-full h-8 flex items-center justify-center rounded-lg bg-purple-100 text-purple-900 border border-purple-400 dark:bg-purple-900/50 dark:text-purple-200 shadow-2xs"
-                              >
-                                <span className="material-symbols-outlined text-[20px]">
-                                  wb_twilight
-                                </span>
-                              </div>
-                            ) : (
-                              <div className="w-full h-8" />
                             )}
                           </div>
                         </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
                 </div>
-              </>
+              </div>
             )}
           </div>
 
@@ -656,18 +700,6 @@ LỊCH SỬ HOẠT ĐỘNG:
                 </span>
                 <span>Ghi chú</span>
               </h5>
-            </div>
-
-            <div className="relative">
-              <textarea
-                value={notesText}
-                onChange={(e) => setNotesText(e.target.value)}
-                rows={3}
-                className="w-full text-xs p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-[#25262b] text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition-all resize-none shadow-2xs leading-relaxed"
-              />
-            </div>
-
-            <div className="flex items-center justify-end pt-1">
               <button
                 type="button"
                 onClick={handleSaveNotes}
@@ -683,6 +715,16 @@ LỊCH SỬ HOẠT ĐỘNG:
                 <span>{isSavedNotes ? "Đã lưu" : "Lưu"}</span>
               </button>
             </div>
+
+            <div className="relative">
+              <textarea
+                value={notesText}
+                onChange={(e) => setNotesText(e.target.value)}
+                rows={3}
+                className="w-full text-xs p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-[#25262b] text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition-all resize-none shadow-2xs leading-relaxed"
+              />
+            </div>
+
           </div>
 
         </div>

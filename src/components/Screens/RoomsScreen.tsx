@@ -168,7 +168,7 @@ export const RoomsScreen: React.FC<RoomsScreenProps> = ({
                 filteredRooms.map((room) => (
                   <tr
                     key={room.id}
-                    className="hover:bg-slate-50/80 dark:hover:bg-[#1f2023]/60 transition-colors"
+                    className="group hover:bg-slate-50/80 dark:hover:bg-[#1f2023]/60 transition-colors"
                   >
                     {/* Tên phòng */}
                     <td className="py-4 px-5">
@@ -208,43 +208,50 @@ export const RoomsScreen: React.FC<RoomsScreenProps> = ({
 
                     {/* Thao tác (Chỉnh sửa & Bảo trì / Mở hoạt động) */}
                     <td className="py-4 px-5 text-right whitespace-nowrap">
-                      <div className="flex items-center justify-end gap-2">
+                      <div className="flex items-center justify-end gap-1 opacity-90 transition-opacity group-hover:opacity-100">
                         {/* Edit Button (Pencil Icon) */}
                         <button
                           type="button"
                           onClick={() => openEditModal(room)}
-                          className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors cursor-pointer"
+                          className="p-1.5 rounded text-[#44474e] hover:text-[#1b365d] hover:bg-slate-200 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-white transition-colors cursor-pointer"
                           title="Chỉnh sửa thông tin phòng"
+                          aria-label={`Chỉnh sửa ${room.name}`}
                         >
-                          <span className="material-symbols-outlined text-[18px]">edit</span>
+                          <span className="material-symbols-outlined text-[20px]">edit</span>
                         </button>
 
                         {/* Delete Button (Trash Icon) */}
                         <button
                           type="button"
                           onClick={() => setDeletingRoom(room)}
-                          className="p-2 rounded-lg bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/60 text-rose-600 dark:text-rose-300 transition-colors cursor-pointer border border-rose-200/60 dark:border-rose-900/40"
+                          className="p-1.5 rounded text-[#44474e] hover:text-[#DC2626] hover:bg-[#ffdad6] dark:text-slate-300 dark:hover:bg-rose-950/70 dark:hover:text-rose-300 transition-colors cursor-pointer"
                           title="Xóa phòng làm việc"
+                          aria-label={`Xóa ${room.name}`}
                         >
-                          <span className="material-symbols-outlined text-[18px]">delete</span>
+                          <span className="material-symbols-outlined text-[20px]">delete</span>
                         </button>
 
                         {/* Toggle Maintenance / Active Button */}
                         <button
                           type="button"
                           onClick={() => onToggleStatus(room.id)}
-                          className={`p-2 rounded-lg transition-colors cursor-pointer ${
+                          className={`p-1.5 rounded transition-colors cursor-pointer ${
                             room.status === "Hoạt động"
-                              ? "bg-amber-50 hover:bg-amber-100 text-amber-800 dark:bg-amber-950/50 dark:hover:bg-amber-900/80 dark:text-amber-200 border border-amber-200 dark:border-amber-800/60"
-                              : "bg-emerald-50 hover:bg-emerald-100 text-emerald-800 dark:bg-emerald-950/50 dark:hover:bg-emerald-900/80 dark:text-emerald-200 border border-emerald-200 dark:border-emerald-800/60"
+                              ? "text-[#44474e] hover:text-[#EA580C] hover:bg-[#ffddb9] dark:text-slate-300 dark:hover:bg-amber-950/70 dark:hover:text-amber-300"
+                              : "text-[#44474e] hover:text-[#16A34A] hover:bg-[#c7ecc7] dark:text-slate-300 dark:hover:bg-emerald-950/70 dark:hover:text-emerald-300"
                           }`}
                           title={
                             room.status === "Hoạt động"
                               ? "Chuyển sang trạng thái Bảo trì"
                               : "Chuyển sang trạng thái Hoạt động"
                           }
+                          aria-label={
+                            room.status === "Hoạt động"
+                              ? `Chuyển ${room.name} sang trạng thái Bảo trì`
+                              : `Chuyển ${room.name} sang trạng thái Hoạt động`
+                          }
                         >
-                          <span className="material-symbols-outlined text-[18px]">
+                          <span className="material-symbols-outlined text-[20px]">
                             {room.status === "Hoạt động" ? "build" : "check_circle"}
                           </span>
                         </button>

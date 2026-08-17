@@ -25,6 +25,31 @@ export const ViewRequestModal: React.FC<ViewRequestModalProps> = ({
   const cccdFrontUrl = request.cccdFront || DEFAULT_CCCD_FRONT;
   const cccdBackUrl = request.cccdBack || DEFAULT_CCCD_BACK;
 
+  const handleViewCV = () => {
+    if (request.cvFile) {
+      window.open(request.cvFile, "_blank", "noopener,noreferrer");
+      return;
+    }
+
+    alert(`Đang mở tài liệu: ${request.cvFileName || "CV"}`);
+  };
+
+  const fallbackContent = [
+    "HỒ SƠ ĐĂNG KÝ CỘNG TÁC VIÊN",
+    "",
+    `Họ và tên: ${request.name}`,
+    `Số điện thoại: ${request.phone}`,
+    `Email: ${request.email}`,
+    `Ngày sinh: ${request.dob || "Chưa cập nhật"}`,
+    `Ngày đăng ký: ${formatDateOnly(request.submittedAt)}`,
+  ].join("\n");
+  const fallbackName = `${(request.cvFileName || `CV_${request.name}`)
+    .replace(/\.[^.]+$/, "")
+    .replace(/\s+/g, "_")}.txt`;
+  const downloadHref =
+    request.cvFile || `data:text/plain;charset=utf-8,${encodeURIComponent(fallbackContent)}`;
+  const downloadName = request.cvFile ? request.cvFileName || "CV.pdf" : fallbackName;
+
   return (
     <div className="fixed inset-0 bg-black/40 backdrop-blur-xs z-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in-95 duration-150">
@@ -149,26 +174,40 @@ export const ViewRequestModal: React.FC<ViewRequestModalProps> = ({
                   </div>
                 </div>
 
-                <div className="flex items-center gap-1.5 shrink-0">
-                  {request.cvFile ? (
-                    <a
-                      href={request.cvFile}
-                      download={request.cvFileName || "CV.pdf"}
-                      className="px-2.5 py-1.5 bg-[#1b365d] text-white text-[11px] font-semibold rounded-lg hover:bg-[#002046] transition-colors flex items-center gap-1 shadow-2xs"
-                    >
-                      <span className="material-symbols-outlined text-[14px]">download</span>
-                      <span>Tải về</span>
-                    </a>
-                  ) : (
+                <div className="flex shrink-0 items-center gap-1.5">
+                  <div className="group relative">
                     <button
                       type="button"
-                      onClick={() => alert(`Đang mở tài liệu: ${request.cvFileName || "CV"}`)}
-                      className="px-2.5 py-1.5 bg-[#1b365d] text-white text-[11px] font-semibold rounded-lg hover:bg-[#002046] transition-colors flex items-center gap-1 shadow-2xs cursor-pointer"
+                      onClick={handleViewCV}
+                      aria-label="Xem file"
+                      className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg border border-slate-200 bg-slate-100 text-slate-700 shadow-2xs transition-colors hover:bg-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40"
                     >
-                      <span className="material-symbols-outlined text-[14px]">visibility</span>
-                      <span>Xem file</span>
+                      <span className="material-symbols-outlined text-[18px]">visibility</span>
                     </button>
-                  )}
+                    <span
+                      role="tooltip"
+                      className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-slate-900 px-2.5 py-1.5 text-[11px] font-semibold text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100 group-focus-within:opacity-100"
+                    >
+                      Xem file
+                    </span>
+                  </div>
+
+                  <div className="group relative">
+                    <a
+                      href={downloadHref}
+                      download={downloadName}
+                      aria-label="Tải về"
+                      className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg border border-slate-200 bg-slate-100 text-slate-700 shadow-2xs transition-colors hover:bg-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40"
+                    >
+                      <span className="material-symbols-outlined text-[18px]">download</span>
+                    </a>
+                    <span
+                      role="tooltip"
+                      className="pointer-events-none absolute bottom-full right-0 z-20 mb-2 whitespace-nowrap rounded-lg bg-slate-900 px-2.5 py-1.5 text-[11px] font-semibold text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100 group-focus-within:opacity-100"
+                    >
+                      Tải về
+                    </span>
+                  </div>
                 </div>
               </div>
             ) : (
