@@ -16,8 +16,6 @@ const DEFAULT_CCCD_BACK =
 export const ViewRequestModal: React.FC<ViewRequestModalProps> = ({
   request,
   onClose,
-  onApprove,
-  onReject,
 }) => {
   const [previewImg, setPreviewImg] = useState<{ title: string; url: string } | null>(null);
 
@@ -185,37 +183,6 @@ export const ViewRequestModal: React.FC<ViewRequestModalProps> = ({
             )}
           </div>
 
-          <div className="pt-4 border-t border-[#E2E8F0] flex items-center justify-end gap-3">
-            <button
-              onClick={onClose}
-              className="px-4 py-2 border border-[#E2E8F0] rounded text-xs font-semibold text-[#44474e] hover:bg-gray-100 transition-colors cursor-pointer"
-            >
-              Đóng
-            </button>
-
-            {request.status === "Chờ duyệt" && (
-              <>
-                <button
-                  onClick={() => {
-                    onReject(request.id);
-                    onClose();
-                  }}
-                  className="px-4 py-2 bg-[#ffdad6] text-[#93000a] hover:bg-[#ffb4ab] font-semibold text-xs rounded transition-colors cursor-pointer"
-                >
-                  Từ chối
-                </button>
-                <button
-                  onClick={() => {
-                    onApprove(request.id);
-                    onClose();
-                  }}
-                  className="px-4 py-2 bg-accent hover:opacity-90 text-white font-semibold text-xs rounded transition-colors cursor-pointer"
-                >
-                  Duyệt hồ sơ
-                </button>
-              </>
-            )}
-          </div>
         </div>
       </div>
 

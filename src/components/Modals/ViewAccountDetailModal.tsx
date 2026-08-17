@@ -27,7 +27,6 @@ export const ViewAccountDetailModal: React.FC<ViewAccountDetailModalProps> = ({
   account,
   shifts = [],
   onClose,
-  onToggleStatus,
   onSaveNotes,
   onEndSchedule,
 }) => {
@@ -704,35 +703,6 @@ LỊCH SỬ HOẠT ĐỘNG:
             </div>
           </div>
 
-          {/* Bottom Action Controls */}
-          <div className="pt-4 border-t border-[#E2E8F0] dark:border-[#3b3d45] flex items-center justify-between">
-            <button
-              onClick={() => {
-                onToggleStatus(account.id);
-                onClose();
-              }}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-2xs ${
-                account.status === "Kích hoạt"
-                  ? "bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100 dark:bg-rose-950/50 dark:text-rose-300"
-                  : "bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 dark:bg-emerald-950/50 dark:text-emerald-300"
-              }`}
-            >
-              {account.status === "Kích hoạt" ? "Vô hiệu hóa tài khoản" : "Kích hoạt tài khoản"}
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setIsEndScheduleModalOpen(true);
-                setEndScheduleError("");
-                setEndScheduleReason("");
-                setEndScheduleEndDate(new Date().toISOString().split("T")[0]);
-              }}
-              className="px-4 py-2 bg-rose-600 hover:bg-rose-700 dark:bg-rose-600 dark:hover:bg-rose-700 text-white font-bold text-xs rounded-xl transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs"
-            >
-              <span className="material-symbols-outlined text-[16px]">event_busy</span>
-              <span>Kết thúc lịch làm việc</span>
-            </button>
-          </div>
         </div>
       </div>
 
@@ -762,6 +732,9 @@ LỊCH SỬ HOẠT ĐỘNG:
                 <span className="material-symbols-outlined text-[20px]">close</span>
               </button>
             </div>
+
+
+
 
             {/* Explanation card */}
             <div className="p-3 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/60 rounded-xl text-amber-800 dark:text-amber-300 text-xs flex items-start gap-2.5">
@@ -888,14 +861,6 @@ LỊCH SỬ HOẠT ĐỘNG:
                 className="w-full h-auto object-contain max-h-[60vh]"
               />
             </div>
-            <div className="flex justify-end">
-              <button
-                onClick={() => setPreviewImg(null)}
-                className="px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs rounded-xl transition-colors cursor-pointer"
-              >
-                Đóng
-              </button>
-            </div>
           </div>
         </div>
       )}
@@ -927,135 +892,131 @@ LỊCH SỬ HOẠT ĐỘNG:
                   </p>
                 </div>
               </div>
-              <button
-                onClick={() => setPreviewDoc(null)}
-                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1 rounded-full cursor-pointer"
-              >
-                <span className="material-symbols-outlined text-[20px]">close</span>
-              </button>
-            </div>
-
-            {/* Document Content Simulation Viewer */}
-            <div className="flex-1 overflow-y-auto p-6 bg-slate-50 dark:bg-slate-900/60 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 space-y-4 font-sans text-xs shadow-inner">
-              <div className="bg-white dark:bg-[#1e1f23] p-6 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm space-y-5">
-                {/* CV Header */}
-                <div className="border-b border-slate-200 dark:border-slate-700 pb-4 flex items-start justify-between gap-4">
-                  <div>
-                    <h2 className="text-base font-bold text-[#1b365d] dark:text-white uppercase tracking-wide">
-                      {account.name}
-                    </h2>
-                    <p className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 mt-0.5">
-                      Vị trí ứng tuyển: Cộng tác viên{" "}
-                      {account.cctvCode ? `(${account.cctvCode})` : ""}
-                    </p>
-                    <p className="text-[11px] text-slate-500 mt-1">
-                      Phòng làm việc:{" "}
-                      <span className="font-semibold text-slate-700 dark:text-slate-300">
-                        {assignedWorkRoom}
-                      </span>
-                    </p>
-                  </div>
-                  <div className="text-right text-[11px] text-slate-500 space-y-0.5 shrink-0">
-                    <p>📧 {account.email}</p>
-                    <p>📞 {account.phone}</p>
-                    <p>📍 {account.address || "TP. Hồ Chí Minh"}</p>
-                  </div>
+              <div className="flex items-center gap-1.5">
+                <div className="relative group">
+                  <button
+                    type="button"
+                    onClick={handleDownloadCV}
+                    aria-label="Tải file về máy"
+                    className="text-[#1b365d] hover:text-indigo-700 hover:bg-indigo-50 dark:text-indigo-300 dark:hover:text-indigo-200 dark:hover:bg-indigo-950/50 p-1.5 rounded-full transition-colors cursor-pointer"
+                  >
+                    <span className="material-symbols-outlined text-[20px]">download</span>
+                  </button>
+                  <span
+                    role="tooltip"
+                    className="pointer-events-none absolute right-0 top-full z-10 mt-2 whitespace-nowrap rounded-lg bg-slate-900 px-2.5 py-1.5 text-[11px] font-semibold text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100 group-focus-within:opacity-100 dark:bg-slate-100 dark:text-slate-900"
+                  >
+                    Tải file về máy
+                  </span>
                 </div>
-
-                {/* Section 1: Thông tin cá nhân */}
-                <div>
-                  <h4 className="text-xs font-bold text-[#1b365d] dark:text-indigo-300 uppercase tracking-wider mb-2 border-b border-slate-100 dark:border-slate-800 pb-1">
-                    1. Thông tin chung
-                  </h4>
-                  <div className="grid grid-cols-2 gap-2 text-[11px]">
-                    <p>
-                      <span className="text-slate-500">Ngày sinh:</span>{" "}
-                      <span className="font-medium">{account.dob || "Chưa cập nhật"}</span>
-                    </p>
-                    <p>
-                      <span className="text-slate-500">Giới tính:</span>{" "}
-                      <span className="font-medium">{account.gender || "Nam"}</span>
-                    </p>
-                    <p>
-                      <span className="text-slate-500">Số CCCD:</span>{" "}
-                      <span className="font-medium">{account.cccd || "Đã xác thực"}</span>
-                    </p>
-                    <p>
-                      <span className="text-slate-500">Ngày tham gia:</span>{" "}
-                      <span className="font-medium">
-                        {account.joinDate || account.registerDate || "01/12/2023"}
-                      </span>
-                    </p>
-                  </div>
-                </div>
-
-                {/* Section 2: Kỹ năng & Chuyên môn */}
-                <div>
-                  <h4 className="text-xs font-bold text-[#1b365d] dark:text-indigo-300 uppercase tracking-wider mb-2 border-b border-slate-100 dark:border-slate-800 pb-1">
-                    2. Kỹ năng & Chuyên môn
-                  </h4>
-                  <div className="flex flex-wrap gap-1.5">
-                    {(
-                      account.skills || [
-                        "Tin học văn phòng",
-                        "Giao tiếp cơ bản",
-                        "Hỗ trợ sự kiện",
-                        "Làm việc nhóm",
-                      ]
-                    ).map((skill, idx) => (
-                      <span
-                        key={idx}
-                        className="px-2 py-0.5 bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 rounded text-[10px] font-medium"
-                      >
-                        {skill}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Section 3: Quá trình hoạt động */}
-                <div>
-                  <h4 className="text-xs font-bold text-[#1b365d] dark:text-indigo-300 uppercase tracking-wider mb-2 border-b border-slate-100 dark:border-slate-800 pb-1">
-                    3. Lịch sử & Đánh giá công việc
-                  </h4>
-                  <div className="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg text-[11px] space-y-1">
-                    <p>
-                      • <strong>Số ca đã hoàn thành:</strong> {account.shiftsCompleted || 0} ca trực
-                    </p>
-                    <p>
-                      • <strong>Đánh giá hiệu suất:</strong> {account.rating || 5.0} / 5.0 ⭐ (Đạt
-                      chuẩn)
-                    </p>
-                    <p>
-                      • <strong>Tình trạng hồ sơ:</strong> Đã kiểm tra & phê duyệt hợp lệ
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Footer */}
-            <div className="flex items-center justify-between pt-2 border-t border-slate-200 dark:border-slate-700">
-              <span className="text-[11px] text-slate-500">
-                Tài liệu định dạng chuẩn:{" "}
-                {previewDoc.isPdf ? "Portable Document Format (.pdf)" : "Microsoft Word (.docx)"}
-              </span>
-              <div className="flex items-center gap-2">
                 <button
-                  onClick={handleDownloadCV}
-                  className="px-4 py-2 bg-[#1b365d] hover:bg-[#002046] dark:bg-indigo-600 dark:hover:bg-indigo-700 text-white font-bold text-xs rounded-xl transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs"
-                >
-                  <span className="material-symbols-outlined text-[16px]">download</span>
-                  <span>Tải file về máy</span>
-                </button>
-                <button
+                  type="button"
                   onClick={() => setPreviewDoc(null)}
-                  className="px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs rounded-xl transition-colors cursor-pointer"
+                  aria-label="Đóng cửa sổ xem CV"
+                  className="text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:text-slate-200 dark:hover:bg-slate-800 p-1.5 rounded-full transition-colors cursor-pointer"
                 >
-                  Đóng
+                  <span className="material-symbols-outlined text-[20px]">close</span>
                 </button>
               </div>
             </div>
+
+            {/* Document Content Simulation Viewer (Single Clean Border) */}
+            <div className="flex-1 overflow-y-auto p-6 bg-white dark:bg-[#1e1f23] rounded-xl border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 space-y-5 font-sans text-xs">
+              {/* CV Header */}
+              <div className="border-b border-slate-200 dark:border-slate-700 pb-4 flex items-start justify-between gap-4">
+                <div>
+                  <h2 className="text-base font-bold text-[#1b365d] dark:text-white uppercase tracking-wide">
+                    {account.name}
+                  </h2>
+                  <p className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 mt-0.5">
+                    Vị trí ứng tuyển: Cộng tác viên{" "}
+                    {account.cctvCode ? `(${account.cctvCode})` : ""}
+                  </p>
+                  <p className="text-[11px] text-slate-500 mt-1">
+                    Phòng làm việc:{" "}
+                    <span className="font-semibold text-slate-700 dark:text-slate-300">
+                      {assignedWorkRoom}
+                    </span>
+                  </p>
+                </div>
+                <div className="text-right text-[11px] text-slate-500 space-y-0.5 shrink-0">
+                  <p>📧 {account.email}</p>
+                  <p>📞 {account.phone}</p>
+                  <p>📍 {account.address || "TP. Hồ Chí Minh"}</p>
+                </div>
+              </div>
+
+              {/* Section 1: Thông tin cá nhân */}
+              <div>
+                <h4 className="text-xs font-bold text-[#1b365d] dark:text-indigo-300 uppercase tracking-wider mb-2 border-b border-slate-100 dark:border-slate-800 pb-1">
+                  1. Thông tin chung
+                </h4>
+                <div className="grid grid-cols-2 gap-2 text-[11px]">
+                  <p>
+                    <span className="text-slate-500">Ngày sinh:</span>{" "}
+                    <span className="font-medium">{account.dob || "Chưa cập nhật"}</span>
+                  </p>
+                  <p>
+                    <span className="text-slate-500">Giới tính:</span>{" "}
+                    <span className="font-medium">{account.gender || "Nam"}</span>
+                  </p>
+                  <p>
+                    <span className="text-slate-500">Số CCCD:</span>{" "}
+                    <span className="font-medium">{account.cccd || "Đã xác thực"}</span>
+                  </p>
+                  <p>
+                    <span className="text-slate-500">Ngày tham gia:</span>{" "}
+                    <span className="font-medium">
+                      {account.joinDate || account.registerDate || "01/12/2023"}
+                    </span>
+                  </p>
+                </div>
+              </div>
+
+              {/* Section 2: Kỹ năng & Chuyên môn */}
+              <div>
+                <h4 className="text-xs font-bold text-[#1b365d] dark:text-indigo-300 uppercase tracking-wider mb-2 border-b border-slate-100 dark:border-slate-800 pb-1">
+                  2. Kỹ năng & Chuyên môn
+                </h4>
+                <div className="flex flex-wrap gap-1.5">
+                  {(
+                    account.skills || [
+                      "Tin học văn phòng",
+                      "Giao tiếp cơ bản",
+                      "Hỗ trợ sự kiện",
+                      "Làm việc nhóm",
+                    ]
+                  ).map((skill, idx) => (
+                    <span
+                      key={idx}
+                      className="px-2 py-0.5 bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 rounded text-[10px] font-medium"
+                    >
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Section 3: Quá trình hoạt động */}
+              <div>
+                <h4 className="text-xs font-bold text-[#1b365d] dark:text-indigo-300 uppercase tracking-wider mb-2 border-b border-slate-100 dark:border-slate-800 pb-1">
+                  3. Lịch sử & Đánh giá công việc
+                </h4>
+                <div className="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg text-[11px] space-y-1">
+                  <p>
+                    • <strong>Số ca đã hoàn thành:</strong> {account.shiftsCompleted || 0} ca trực
+                  </p>
+                  <p>
+                    • <strong>Đánh giá hiệu suất:</strong> {account.rating || 5.0} / 5.0 ⭐ (Đạt
+                    chuẩn)
+                  </p>
+                  <p>
+                    • <strong>Tình trạng hồ sơ:</strong> Đã kiểm tra & phê duyệt hợp lệ
+                  </p>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
       )}

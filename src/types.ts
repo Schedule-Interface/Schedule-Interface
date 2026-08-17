@@ -162,3 +162,24 @@ export function formatPhoneNumber(phone?: string): string {
   }
   return phone;
 }
+
+export function formatDateOnly(dateTime?: string): string {
+  if (!dateTime) return "";
+
+  const value = dateTime.trim();
+  if (!value) return "";
+
+  const vietnameseDate = value.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:[,\sT].*)?$/);
+  if (vietnameseDate) {
+    const [, day, month, year] = vietnameseDate;
+    return `${day.padStart(2, "0")}/${month.padStart(2, "0")}/${year}`;
+  }
+
+  const isoDate = value.match(/^(\d{4})-(\d{1,2})-(\d{1,2})(?:[\sT].*)?$/);
+  if (isoDate) {
+    const [, year, month, day] = isoDate;
+    return `${day.padStart(2, "0")}/${month.padStart(2, "0")}/${year}`;
+  }
+
+  return value;
+}
