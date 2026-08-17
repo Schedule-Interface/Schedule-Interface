@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { RegistrationRequest } from "../../types";
+import { RegistrationRequest, formatPhoneNumber, formatDateOnly } from "../../types";
 
 interface ViewRequestModalProps {
   request: RegistrationRequest | null;
@@ -46,7 +46,9 @@ export const ViewRequestModal: React.FC<ViewRequestModalProps> = ({
             </div>
             <div>
               <h4 className="text-xl font-bold text-[#1a1b1e]">{request.name}</h4>
-              <p className="text-xs text-[#44474e]">Thời gian đăng ký: {request.submittedAt}</p>
+              <p className="text-xs text-[#44474e]">
+                Thời gian đăng ký: {formatDateOnly(request.submittedAt)}
+              </p>
             </div>
           </div>
 
@@ -57,7 +59,9 @@ export const ViewRequestModal: React.FC<ViewRequestModalProps> = ({
             </div>
             <div className="flex justify-between border-b border-slate-100 pb-2">
               <span className="text-[#74777f] font-medium">Số điện thoại:</span>
-              <span className="font-semibold text-[#1a1b1e]">{request.phone}</span>
+              <span className="font-semibold text-[#1a1b1e]">
+                {formatPhoneNumber(request.phone)}
+              </span>
             </div>
             <div className="flex justify-between border-b border-slate-100 pb-2">
               <span className="text-[#74777f] font-medium">Email:</span>
@@ -124,7 +128,6 @@ export const ViewRequestModal: React.FC<ViewRequestModalProps> = ({
                 <span className="material-symbols-outlined text-[16px]">description</span>
                 <span>Hồ sơ ứng tuyển (CV)</span>
               </span>
-              <span className="text-[10px] text-slate-500 font-medium">PDF / Word</span>
             </div>
 
             {request.cvFileName || request.cvFile ? (

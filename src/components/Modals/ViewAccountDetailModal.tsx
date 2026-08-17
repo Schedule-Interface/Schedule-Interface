@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { UserAccount, ShiftSlot } from "../../types";
+import { UserAccount, ShiftSlot, formatPhoneNumber } from "../../types";
 
 interface ViewAccountDetailModalProps {
   account: UserAccount | null;
@@ -362,7 +362,7 @@ LỊCH SỬ HOẠT ĐỘNG:
               <div className="flex justify-between p-2 rounded bg-white dark:bg-[#25262b] border border-[#E2E8F0]/60 dark:border-[#3b3d45]">
                 <span className="text-[#74777f]">Số điện thoại:</span>
                 <span className="font-semibold text-[#1b365d] dark:text-white">
-                  {account.phone}
+                  {formatPhoneNumber(account.phone)}
                 </span>
               </div>
               <div className="flex justify-between p-2 rounded bg-white dark:bg-[#25262b] border border-[#E2E8F0]/60 dark:border-[#3b3d45]">
