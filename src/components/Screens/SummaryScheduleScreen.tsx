@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { ShiftSlot, UserAccount, AssignedCTV } from "../../types";
+import { getAssignedCTVsForDate } from "../../utils/scheduleSelectors";
 
 interface SummaryScheduleScreenProps {
   shifts: ShiftSlot[];
@@ -9,24 +10,6 @@ interface SummaryScheduleScreenProps {
   currentUser?: UserAccount;
   userRole?: "Admin" | "Cộng tác viên";
 }
-
-// Default room assignments generator
-const DEFAULT_ROOMS = [
-  "Phòng 302 - Tòa A (Bộ phận Tiếp nhận hồ sơ)",
-  "Phòng 105 - Tòa B (Tổ Kỹ thuật & Hạ tầng)",
-  "Phòng Tổng đài - Tòa C (Chăm sóc Khách hàng)",
-  "Phòng 204 - Tòa A (Bộ phận Nhập liệu & Báo cáo)",
-  "Phòng Trực ban - Tòa A (Hướng dẫn Thủ tục & Phân luồng)",
-];
-
-// Default task contents generator
-const DEFAULT_TASKS = [
-  "Hỗ trợ hướng dẫn người dân nộp hồ sơ, kiểm tra tính hợp lệ của tài liệu và tiếp nhận giấy tờ.",
-  "Trực hệ thống tổng đài, giải đáp thắc mắc của khách hàng và chuyển giao thông tin phản ánh.",
-  "Kiểm tra hạ tầng kỹ thuật máy tính, cấu hình mạng và hỗ trợ thiết bị cho các phòng ban.",
-  "Nhập liệu danh sách báo cáo tổng hợp ca trực, rà soát dữ liệu và lưu trữ hồ sơ điện tử.",
-  "Phối hợp điều phối phân luồng, hướng dẫn khách hàng tại khu vực sảnh chờ tiếp dân.",
-];
 
 export const SummaryScheduleScreen: React.FC<SummaryScheduleScreenProps> = ({
   shifts,
@@ -92,21 +75,8 @@ export const SummaryScheduleScreen: React.FC<SummaryScheduleScreenProps> = ({
     setSelectedMonth(todayObj.getMonth());
   };
 
-  // Helper to get shifts for a weekday (0=T2 to 4=T6) and shiftType
-  const getShiftsForDayAndType = (dayIndex: number, type: "morning" | "afternoon") => {
-    return shifts.filter((s) => s.dayIndex === dayIndex && s.shiftType === type);
-  };
-
-  const getAssignedCTVs = (dayIndex: number, type: "morning" | "afternoon") => {
-    const matchedShifts = getShiftsForDayAndType(dayIndex, type);
-    const rawList = matchedShifts.flatMap((s) => s.assignedCTVs || []);
-    return rawList.filter((ctv) => {
-      const acc = accounts.find(
-        (a) => a.id === ctv.id || a.name.toLowerCase() === ctv.name.toLowerCase(),
-      );
-      return !acc || acc.role !== "Admin";
-    });
-  };
+  const getAssignedCTVs = (workDate: string, type: "morning" | "afternoon") =>
+    getAssignedCTVsForDate(shifts, accounts, workDate, type);
 
   // Calculate Month Calendar Weeks & Days (Mon-Fri)
   const getMonthCalendarWeeks = () => {
@@ -118,6 +88,7 @@ export const SummaryScheduleScreen: React.FC<SummaryScheduleScreenProps> = ({
         dayName: string;
         dateFormatted: string;
         dateShort: string;
+        dateISO: string;
         isToday: boolean;
         isValid: boolean;
       } | null>
@@ -129,6 +100,7 @@ export const SummaryScheduleScreen: React.FC<SummaryScheduleScreenProps> = ({
       dayName: string;
       dateFormatted: string;
       dateShort: string;
+      dateISO: string;
       isToday: boolean;
       isValid: boolean;
     } | null> = [null, null, null, null, null]; // Mon, Tue, Wed, Thu, Fri
@@ -148,6 +120,7 @@ export const SummaryScheduleScreen: React.FC<SummaryScheduleScreenProps> = ({
         const dayIndex = dow - 1;
         const dateFormatted = `${String(d).padStart(2, "0")}/${String(selectedMonth + 1).padStart(2, "0")}/${selectedYear}`;
         const dateShort = `${String(d).padStart(2, "0")}/${String(selectedMonth + 1).padStart(2, "0")}`;
+        const dateISO = `${selectedYear}-${String(selectedMonth + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
         const isToday =
           selectedYear === realTodayYear && selectedMonth === realTodayMonth && d === realTodayDate;
 
@@ -157,6 +130,7 @@ export const SummaryScheduleScreen: React.FC<SummaryScheduleScreenProps> = ({
           dayName: dayNames[dayIndex],
           dateFormatted,
           dateShort,
+          dateISO,
           isToday,
           isValid: true,
         };
@@ -179,14 +153,15 @@ export const SummaryScheduleScreen: React.FC<SummaryScheduleScreenProps> = ({
   const getTodayCTVList = () => {
     const todayObj = new Date();
     const dayOfWeek = (todayObj.getDay() + 6) % 7; // 0: T2 ... 6: CN
-    const dayIndex = Math.min(Math.max(0, dayOfWeek), 4); // Mon-Fri (0..4)
     const dayNamesList = ["Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7", "Chủ Nhật"];
     const dayNameStr = dayNamesList[dayOfWeek] || "Thứ 2";
     const dateStr = `${String(todayObj.getDate()).padStart(2, "0")}/${String(todayObj.getMonth() + 1).padStart(2, "0")}/${todayObj.getFullYear()}`;
+    const dateISO = `${todayObj.getFullYear()}-${String(todayObj.getMonth() + 1).padStart(2, "0")}-${String(todayObj.getDate()).padStart(2, "0")}`;
     const dayLabel = `Hôm nay (${dayNameStr} - ${dateStr})`;
 
-    const morningList = getAssignedCTVs(dayIndex, "morning");
-    const afternoonList = getAssignedCTVs(dayIndex, "afternoon");
+    const isWeekday = dayOfWeek >= 0 && dayOfWeek <= 4;
+    const morningList = isWeekday ? getAssignedCTVs(dateISO, "morning") : [];
+    const afternoonList = isWeekday ? getAssignedCTVs(dateISO, "afternoon") : [];
 
     type TodayCTVItem = {
       ctv: AssignedCTV;
@@ -232,22 +207,7 @@ export const SummaryScheduleScreen: React.FC<SummaryScheduleScreenProps> = ({
     if (matched) {
       onViewAccountDetail(matched);
     } else {
-      onViewAccountDetail({
-        id: ctv.id,
-        stt: 1,
-        name: ctv.name,
-        email: `${ctv.id}@company.vn`,
-        phone: ctv.phone || "090 123 4567",
-        role: "Cộng tác viên",
-        status: "Kích hoạt",
-        registerDate: "01/01/2023",
-        initials: ctv.initials || ctv.name.substring(0, 2).toUpperCase(),
-        avatar: ctv.avatar,
-        cctvCode: ctv.cctvCode || `CTV-2023-${ctv.id}`,
-        joinDate: "15/01/2023",
-        shiftsCompleted: 12,
-        rating: 5.0,
-      });
+      onShowToast?.(`Không tìm thấy hồ sơ tài khoản của ${ctv.name}.`);
     }
   };
 
@@ -255,14 +215,17 @@ export const SummaryScheduleScreen: React.FC<SummaryScheduleScreenProps> = ({
     dayName: string,
     dateFormatted: string,
     shiftName: "Ca Sáng" | "Ca Chiều",
-    dayIndex: number,
+    workDate: string,
   ) => {
-    const rawList = getAssignedCTVs(dayIndex, shiftName === "Ca Sáng" ? "morning" : "afternoon");
+    const rawList = getAssignedCTVs(
+      workDate,
+      shiftName === "Ca Sáng" ? "morning" : "afternoon",
+    );
 
     // Enrich CTVs with room and taskContent
-    const enrichedList = rawList.map((ctv, idx) => {
-      const roomDisplay = ctv.room || DEFAULT_ROOMS[idx % DEFAULT_ROOMS.length];
-      const taskDisplay = ctv.taskContent || DEFAULT_TASKS[idx % DEFAULT_TASKS.length];
+    const enrichedList = rawList.map((ctv) => {
+      const roomDisplay = ctv.room || "Chưa cập nhật";
+      const taskDisplay = ctv.taskContent || "Chưa cập nhật";
       return {
         ...ctv,
         roomDisplay,
@@ -472,8 +435,8 @@ export const SummaryScheduleScreen: React.FC<SummaryScheduleScreenProps> = ({
                       );
                     }
 
-                    const morningCTVs = getAssignedCTVs(cell.dayIndex, "morning");
-                    const afternoonCTVs = getAssignedCTVs(cell.dayIndex, "afternoon");
+                    const morningCTVs = getAssignedCTVs(cell.dateISO, "morning");
+                    const afternoonCTVs = getAssignedCTVs(cell.dateISO, "afternoon");
 
                     return (
                       <div
@@ -507,7 +470,7 @@ export const SummaryScheduleScreen: React.FC<SummaryScheduleScreenProps> = ({
                                   cell.dayName,
                                   cell.dateFormatted,
                                   "Ca Sáng",
-                                  cell.dayIndex,
+                                  cell.dateISO,
                                 )
                               }
                               className="w-full px-2.5 py-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/40 dark:hover:bg-amber-950/80 border border-amber-200/80 dark:border-amber-900/40 flex items-center justify-between text-left transition-all cursor-pointer group"
@@ -533,7 +496,7 @@ export const SummaryScheduleScreen: React.FC<SummaryScheduleScreenProps> = ({
                                   cell.dayName,
                                   cell.dateFormatted,
                                   "Ca Chiều",
-                                  cell.dayIndex,
+                                  cell.dateISO,
                                 )
                               }
                               className="w-full px-2.5 py-1.5 rounded-lg bg-purple-50 hover:bg-purple-100 dark:bg-purple-950/40 dark:hover:bg-purple-950/80 border border-purple-200/80 dark:border-purple-900/40 flex items-center justify-between text-left transition-all cursor-pointer group"

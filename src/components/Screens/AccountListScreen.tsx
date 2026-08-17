@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { UserAccount, UserRole, formatPhoneNumber } from "../../types";
+import { UserAccount, UserRole } from "../../types";
+import { formatPhoneNumber } from "../../utils/formatters";
 
 interface AccountListScreenProps {
   accounts: UserAccount[];
@@ -18,7 +19,7 @@ export const AccountListScreen: React.FC<AccountListScreenProps> = ({
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const itemsPerPage = 5;
 
   // Confirm Modals state
   const [accountToToggle, setAccountToToggle] = useState<UserAccount | null>(null);
@@ -93,11 +94,11 @@ export const AccountListScreen: React.FC<AccountListScreenProps> = ({
       </div>
 
       {/* Data Table */}
-      <div className="bg-white border border-[#E2E8F0] rounded-lg overflow-hidden shadow-xs">
-        <div className="overflow-x-auto">
+      <div className="bg-white border border-[#E2E8F0] rounded-lg overflow-hidden shadow-xs flex flex-col">
+        <div className="overflow-x-auto overflow-y-hidden h-[395px]">
           <table className="w-full text-left border-collapse min-w-[800px]">
             <thead>
-              <tr className="bg-[#F8FAFC] border-b border-[#E2E8F0]">
+              <tr className="bg-[#F8FAFC] border-b border-[#E2E8F0] h-[45px]">
                 <th className="py-3 px-4 text-xs font-semibold text-[#44474e] uppercase tracking-wider w-16">
                   STT
                 </th>
@@ -115,7 +116,7 @@ export const AccountListScreen: React.FC<AccountListScreenProps> = ({
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#E2E8F0]">
+            <tbody>
               {currentItems.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="py-12 text-center text-[#74777f] text-sm">
@@ -126,7 +127,7 @@ export const AccountListScreen: React.FC<AccountListScreenProps> = ({
                 currentItems.map((acc, index) => (
                   <tr
                     key={acc.id}
-                    className="hover:bg-[#f4f3f7] transition-colors group cursor-default"
+                    className="hover:bg-[#f4f3f7] transition-colors group cursor-default h-[64px] border-b border-[#E2E8F0]"
                   >
                     <td className="py-3.5 px-4 text-sm text-[#44474e]">{startIndex + index + 1}</td>
                     <td className="py-3.5 px-4">
@@ -195,7 +196,7 @@ export const AccountListScreen: React.FC<AccountListScreenProps> = ({
         </div>
 
         {/* Pagination Footer */}
-        <div className="flex items-center justify-end p-4 border-t border-[#E2E8F0] bg-white">
+        <div className="flex items-center justify-end p-4 border-t border-[#E2E8F0] bg-white h-[61px]">
           <div className="flex items-center gap-1">
             <button
               disabled={currentPage === 1}

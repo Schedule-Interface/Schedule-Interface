@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { UserAccount, ShiftSlot, formatPhoneNumber } from "../../types";
+import { UserAccount, ShiftSlot } from "../../types";
+import { formatPhoneNumber } from "../../utils/formatters";
 
 interface ViewAccountDetailModalProps {
   account: UserAccount | null;
@@ -37,7 +38,7 @@ export const ViewAccountDetailModal: React.FC<ViewAccountDetailModalProps> = ({
     isPdf: boolean;
   } | null>(null);
   const [showWorkHistory, setShowWorkHistory] = useState<boolean>(false);
-  const [historyDate, setHistoryDate] = useState<Date>(new Date(2026, 7, 14)); // Tháng 8, 2026
+  const [historyDate, setHistoryDate] = useState<Date>(() => new Date());
 
   const [notesText, setNotesText] = useState(account?.notes || "");
   const [isSavedNotes, setIsSavedNotes] = useState(false);
@@ -142,8 +143,6 @@ export const ViewAccountDetailModal: React.FC<ViewAccountDetailModalProps> = ({
     setIsEndScheduleModalOpen(false);
   };
 
-  const todayISO = "2026-08-14";
-
   const toISODate = (date: Date) => {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -156,6 +155,8 @@ export const ViewAccountDetailModal: React.FC<ViewAccountDetailModalProps> = ({
     const month = String(date.getMonth() + 1).padStart(2, "0");
     return `${day}/${month}`;
   };
+
+  const todayISO = toISODate(new Date());
 
   const changeHistoryMonth = (amount: number) => {
     setHistoryDate((current) => new Date(current.getFullYear(), current.getMonth() + amount, 1));
@@ -183,28 +184,12 @@ export const ViewAccountDetailModal: React.FC<ViewAccountDetailModalProps> = ({
   const getHistoryShift = (date: Date, shiftType: "morning" | "afternoon") => {
     const dateISO = toISODate(date);
 
-    const explicit = shifts.find(
+    return shifts.find(
       (s) =>
         s.workDate === dateISO &&
         s.shiftType === shiftType &&
         (s.assignedCTVs || []).some((c) => c.id === account.id || c.name === account.name),
     );
-    if (explicit) return explicit;
-
-    const dayStr = formatShortDate(date);
-    // Matching exact sample history:
-    // Week 1 (03/08 - 07/08): both morning and afternoon
-    if (["03/08", "04/08", "05/08", "06/08", "07/08"].includes(dayStr)) {
-      return { shiftType };
-    }
-    // Week 2 (10/08 - 14/08):
-    if (["10/08", "12/08"].includes(dayStr)) {
-      return { shiftType };
-    }
-    if (dayStr === "13/08" && shiftType === "afternoon") {
-      return { shiftType: "afternoon" };
-    }
-    return null;
   };
 
   const cccdFrontUrl = account.cccdFront || DEFAULT_CCCD_FRONT;
@@ -440,13 +425,10 @@ LỊCH SỬ HOẠT ĐỘNG:
             </div>
 
             <div className="mt-3 p-3.5 rounded-xl bg-[#F8FAFC] dark:bg-[#1e1f23] border border-[#E2E8F0] dark:border-[#3b3d45]">
-              <div className="flex items-center justify-between mb-2.5">
+              <div className="flex items-center mb-2.5">
                 <span className="text-[11px] font-bold text-[#1b365d] dark:text-[#d6e3ff] uppercase tracking-wider flex items-center gap-1.5">
                   <span className="material-symbols-outlined text-[16px]">badge</span>
                   <span>Ảnh chụp CCCD (Mặt trước & Mặt sau)</span>
-                </span>
-                <span className="text-[10px] text-slate-500 font-medium">
-                  Nhấn vào ảnh để xem chi tiết
                 </span>
               </div>
               <div className="grid grid-cols-2 gap-3">
