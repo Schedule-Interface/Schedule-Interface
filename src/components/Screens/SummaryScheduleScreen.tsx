@@ -211,10 +211,7 @@ export const SummaryScheduleScreen: React.FC<SummaryScheduleScreenProps> = ({
     shiftName: "Ca Sáng" | "Ca Chiều",
     workDate: string,
   ) => {
-    const rawList = getAssignedCTVs(
-      workDate,
-      shiftName === "Ca Sáng" ? "morning" : "afternoon",
-    );
+    const rawList = getAssignedCTVs(workDate, shiftName === "Ca Sáng" ? "morning" : "afternoon");
 
     // Enrich CTVs with room and taskContent
     const enrichedList = rawList.map((ctv) => {
@@ -480,10 +477,10 @@ export const SummaryScheduleScreen: React.FC<SummaryScheduleScreenProps> = ({
         </div>
       </div>
 
-      {/* Side-Sheet / Modal "Chi tiết ca làm việc" */}
+      {/* Modal "Chi tiết ca làm việc" */}
       {selectedShiftDetail && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-150">
-          <div className="bg-white dark:bg-[#25262b] rounded-2xl border border-slate-200 dark:border-slate-800 w-full max-w-5xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+          <div className="bg-white dark:bg-[#25262b] rounded-2xl border border-slate-200 dark:border-slate-800 w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col max-h-[85vh]">
             {/* Modal Header */}
             <div className="p-4 sm:p-5 bg-slate-50 dark:bg-[#1f2023] border-b border-slate-200 dark:border-slate-800 flex items-center justify-between shrink-0">
               <div>
@@ -495,12 +492,6 @@ export const SummaryScheduleScreen: React.FC<SummaryScheduleScreenProps> = ({
                   {selectedShiftDetail.shiftName} - {selectedShiftDetail.dayName} (
                   {selectedShiftDetail.dateFormatted})
                 </h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 font-medium">
-                  Khung giờ:{" "}
-                  <strong className="text-slate-700 dark:text-slate-300">
-                    {selectedShiftDetail.shiftTimeLabel}
-                  </strong>
-                </p>
               </div>
               <button
                 type="button"
@@ -530,13 +521,12 @@ export const SummaryScheduleScreen: React.FC<SummaryScheduleScreenProps> = ({
               ) : (
                 <div className="border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-2xs">
                   <div className="overflow-x-auto">
-                    <table className="w-full text-left border-collapse min-w-[720px]">
+                    <table className="w-full text-left border-collapse">
                       <thead>
                         <tr className="bg-slate-50 dark:bg-[#1f2023] border-b border-slate-200 dark:border-slate-800 text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                           <th className="py-3.5 px-4">Họ tên CTV</th>
                           <th className="py-3.5 px-4">Số điện thoại</th>
                           <th className="py-3.5 px-4">Phòng làm việc</th>
-                          <th className="py-3.5 px-4">Nội dung công việc dự kiến</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-xs">
@@ -587,13 +577,6 @@ export const SummaryScheduleScreen: React.FC<SummaryScheduleScreenProps> = ({
                               <span className="px-3 py-1 bg-blue-50 dark:bg-blue-950/80 text-blue-800 dark:text-blue-300 font-semibold rounded-lg border border-blue-100 dark:border-blue-900/60 inline-block text-[11px]">
                                 {ctv.roomDisplay}
                               </span>
-                            </td>
-
-                            {/* Nội dung công việc */}
-                            <td className="py-3.5 px-4">
-                              <p className="text-slate-700 dark:text-slate-300 leading-relaxed max-w-md">
-                                {ctv.taskDisplay}
-                              </p>
                             </td>
                           </tr>
                         ))}
