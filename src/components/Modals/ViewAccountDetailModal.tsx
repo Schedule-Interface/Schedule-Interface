@@ -364,23 +364,6 @@ LỊCH SỬ HOẠT ĐỘNG:
                 <h4 className="text-lg font-bold text-[#1b365d] dark:text-[#d6e3ff]">
                   {account.name}
                 </h4>
-                <p className="text-xs text-[#74777f] dark:text-[#c4c6cf] font-mono mt-0.5">
-                  {account.cctvCode || account.phone}
-                </p>
-                <div className="flex items-center gap-2 mt-2">
-                  <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#1b365d]/10 text-[#1b365d] dark:bg-[#1b365d]/30 dark:text-[#87a0cd]">
-                    {account.role}
-                  </span>
-                  <span
-                    className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold ${
-                      account.status === "Kích hoạt"
-                        ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300"
-                        : "bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300"
-                    }`}
-                  >
-                    {account.status}
-                  </span>
-                </div>
               </div>
             </div>
 
@@ -640,7 +623,9 @@ LỊCH SỬ HOẠT ĐỘNG:
                           <div className="space-y-2">
                             {morning !== "off" ? (
                               <div
-                                title={morning === "pending" ? "Ca sáng: Chờ duyệt" : "Ca sáng: Đi làm"}
+                                title={
+                                  morning === "pending" ? "Ca sáng: Chờ duyệt" : "Ca sáng: Đi làm"
+                                }
                                 className={`flex w-full items-center gap-2 whitespace-nowrap rounded-xl border px-3 py-2 text-xs font-bold shadow-xs ${
                                   morning === "pending"
                                     ? "border-amber-300 bg-amber-100 text-amber-900 dark:border-amber-700 dark:bg-amber-900/50 dark:text-amber-100"
@@ -724,9 +709,7 @@ LỊCH SỬ HOẠT ĐỘNG:
                 className="w-full text-xs p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-[#25262b] text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition-all resize-none shadow-2xs leading-relaxed"
               />
             </div>
-
           </div>
-
         </div>
       </div>
 
@@ -756,9 +739,6 @@ LỊCH SỬ HOẠT ĐỘNG:
                 <span className="material-symbols-outlined text-[20px]">close</span>
               </button>
             </div>
-
-
-
 
             {/* Explanation card */}
             <div className="p-3 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/60 rounded-xl text-amber-800 dark:text-amber-300 text-xs flex items-start gap-2.5">
@@ -1040,7 +1020,6 @@ LỊCH SỬ HOẠT ĐỘNG:
                 </div>
               </div>
             </div>
-
           </div>
         </div>
       )}
@@ -1154,32 +1133,32 @@ LỊCH SỬ HOẠT ĐỘNG:
 
                             <div className="space-y-2 flex-1">
                               {morningShift ? (
-                                <div
-                                  className="flex w-full items-center gap-2 rounded-xl border border-amber-200/90 bg-amber-50 px-3 py-2 text-xs font-bold text-amber-900 shadow-xs select-none pointer-events-none transition-colors dark:border-amber-800/50 dark:bg-amber-950/40 dark:text-amber-200"
-                                >
+                                <div className="flex w-full items-center gap-2 rounded-xl border border-amber-200/90 bg-amber-50 px-3 py-2 text-xs font-bold text-amber-900 shadow-xs select-none pointer-events-none transition-colors dark:border-amber-800/50 dark:bg-amber-950/40 dark:text-amber-200">
                                   <span
                                     className="material-symbols-outlined text-[18px] text-amber-700 dark:text-amber-400"
                                     aria-hidden="true"
                                   >
                                     wb_sunny
                                   </span>
-                                  <span className="text-amber-900 dark:text-amber-100">Ca Sáng</span>
+                                  <span className="text-amber-900 dark:text-amber-100">
+                                    Ca Sáng
+                                  </span>
                                 </div>
                               ) : afternoonShift ? (
                                 <div className="h-[38px]" aria-hidden="true" />
                               ) : null}
 
                               {afternoonShift && (
-                                <div
-                                  className="flex w-full items-center gap-2 rounded-xl border border-purple-200/90 bg-purple-50 px-3 py-2 text-xs font-bold text-purple-900 shadow-xs select-none pointer-events-none transition-colors dark:border-purple-800/50 dark:bg-purple-950/40 dark:text-purple-200"
-                                >
+                                <div className="flex w-full items-center gap-2 rounded-xl border border-purple-200/90 bg-purple-50 px-3 py-2 text-xs font-bold text-purple-900 shadow-xs select-none pointer-events-none transition-colors dark:border-purple-800/50 dark:bg-purple-950/40 dark:text-purple-200">
                                   <span
                                     className="material-symbols-outlined text-[18px] text-purple-700 dark:text-purple-400"
                                     aria-hidden="true"
                                   >
                                     wb_twilight
                                   </span>
-                                  <span className="text-purple-900 dark:text-purple-100">Ca Chiều</span>
+                                  <span className="text-purple-900 dark:text-purple-100">
+                                    Ca Chiều
+                                  </span>
                                 </div>
                               )}
                             </div>

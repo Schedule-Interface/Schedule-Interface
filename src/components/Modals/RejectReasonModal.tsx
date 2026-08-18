@@ -84,24 +84,16 @@ export const RejectReasonModal: React.FC<RejectReasonModalProps> = ({
 
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1">
-              Chi tiết lý do gửi phản hồi email <span className="text-red-500">*</span>:
+              Chi tiết lý do từ chối <span className="text-red-500">*</span>:
             </label>
             <textarea
               rows={3}
               value={reason}
               onChange={(e) => setReason(e.target.value)}
-              placeholder="Nhập cụ thể lý do để thông báo cho ứng viên..."
+              placeholder="Nhập cụ thể lý do từ chối hồ sơ..."
               className="w-full text-xs p-3 border border-slate-300 rounded-xl focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none text-slate-800 resize-none"
               required
             />
-          </div>
-
-          <div className="bg-blue-50 border border-blue-100 p-2.5 rounded-xl flex items-start gap-2 text-[11px] text-blue-800">
-            <span className="material-symbols-outlined text-[16px] text-blue-600 mt-0.5">mail</span>
-            <span>
-              Hệ thống sẽ tự động gửi email phản hồi thông báo lý do đến{" "}
-              <strong className="font-semibold">{request.email}</strong>.
-            </span>
           </div>
 
           <div className="pt-2 border-t border-slate-200 flex items-center justify-end gap-2.5">
@@ -117,7 +109,7 @@ export const RejectReasonModal: React.FC<RejectReasonModalProps> = ({
               disabled={!reason.trim()}
               className="px-4 py-2 bg-[#DC2626] hover:bg-red-700 disabled:opacity-50 text-white text-xs font-bold rounded-xl transition-all shadow-xs cursor-pointer flex items-center gap-1.5"
             >
-              <span className="material-symbols-outlined text-[16px]">send</span>
+              <span className="material-symbols-outlined text-[16px]">cancel</span>
               <span>Xác nhận từ chối</span>
             </button>
           </div>

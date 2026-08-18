@@ -375,7 +375,7 @@ export const App: React.FC = () => {
     };
     setAccounts((prev) => [newAcc, ...prev]);
     if (reason) {
-      showToast(`Đã từ chối hồ sơ của ${req.name} (Lý do: "${reason}"). Đã gửi email phản hồi.`);
+      showToast(`Đã từ chối hồ sơ của ${req.name} (Lý do: "${reason}")`);
     } else {
       showToast(`Đã từ chối hồ sơ của ${req.name} và lưu vào Danh sách tài khoản (Vô hiệu hóa)`);
     }
@@ -685,6 +685,23 @@ export const App: React.FC = () => {
                     showToast("Đã xóa ảnh CCCD mặt sau");
                   } else {
                     showToast("Đã thay đổi ảnh CCCD mặt sau thành công");
+                  }
+                }}
+                onUpdateCvFile={(cvData) => {
+                  if (!cvData) {
+                    handleSaveProfile({
+                      cvFile: undefined,
+                      cvFileName: undefined,
+                      cvFileSize: undefined,
+                    });
+                    showToast("Đã xóa file CV");
+                  } else {
+                    handleSaveProfile({
+                      cvFile: cvData.cvFile,
+                      cvFileName: cvData.cvFileName,
+                      cvFileSize: cvData.cvFileSize,
+                    });
+                    showToast(`Đã cập nhật file CV: ${cvData.cvFileName}`);
                   }
                 }}
               />
