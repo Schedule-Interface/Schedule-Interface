@@ -38,7 +38,6 @@ import { EditProfileModal } from "./components/Modals/EditProfileModal";
 import { ChangePasswordModal } from "./components/Modals/ChangePasswordModal";
 import { NotificationsPopover } from "./components/Modals/NotificationsPopover";
 import { SettingsModal } from "./components/Modals/SettingsModal";
-import { RejectReasonModal } from "./components/Modals/RejectReasonModal";
 import { useSystemSettings } from "./context/SystemSettingsContext";
 import { parseStoredShifts } from "./utils/shiftStorage";
 
@@ -125,9 +124,6 @@ export const App: React.FC = () => {
   const [isCreateUserOpen, setIsCreateUserOpen] = useState(false);
   const [isCreateMeetingOpen, setIsCreateMeetingOpen] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState<RegistrationRequest | null>(null);
-  const [rejectingRequestModal, setRejectingRequestModal] = useState<RegistrationRequest | null>(
-    null,
-  );
   const [selectedAccountDetail, setSelectedAccountDetail] = useState<UserAccount | null>(null);
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
@@ -238,6 +234,43 @@ export const App: React.FC = () => {
     );
   };
 
+  const handleResetPassword = (id: string, newPassword: string, requireChangeOnLogin: boolean) => {
+    const target = accounts.find((a) => a.id === id);
+    if (!target) return;
+
+    const logEntry = `[${new Date().toLocaleDateString("vi-VN")}] Đặt lại mật khẩu mặc định mới (Yêu cầu đổi MK: ${requireChangeOnLogin ? "Có" : "Không"})`;
+
+    setAccounts((prev) =>
+      prev.map((acc) => {
+        if (acc.id === id) {
+          const newNotes = acc.notes ? `${acc.notes}\n${logEntry}` : logEntry;
+          return {
+            ...acc,
+            password: newPassword,
+            mustChangePassword: requireChangeOnLogin,
+            notes: newNotes,
+          };
+        }
+        return acc;
+      }),
+    );
+
+    if (selectedAccountDetail && selectedAccountDetail.id === id) {
+      setSelectedAccountDetail((prev) =>
+        prev
+          ? {
+              ...prev,
+              password: newPassword,
+              mustChangePassword: requireChangeOnLogin,
+              notes: prev.notes ? `${prev.notes}\n${logEntry}` : logEntry,
+            }
+          : null,
+      );
+    }
+
+    showToast(`Đã đặt lại mật khẩu cho ${target.name} thành công. Mật khẩu mới: ${newPassword}`);
+  };
+
   const handleSaveAccountNotes = (id: string, notes: string) => {
     setAccounts((prev) =>
       prev.map((acc) => {
@@ -343,42 +376,16 @@ export const App: React.FC = () => {
     showToast(`Đã phê duyệt hồ sơ của ${req.name} và chuyển sang Danh sách tài khoản`);
   };
 
-  const handleRejectRequest = (id: string, reason?: string) => {
+  const handleRejectRequest = (id: string) => {
     const req = requests.find((r) => r.id === id);
     if (!req) return;
 
-    // Remove from registration requests list
+    // Remove from registration requests list completely
     setRequests((prev) => prev.filter((r) => r.id !== id));
-
-    // Create disabled account in account list
-    const newAcc: UserAccount = {
-      id: `usr-${Date.now()}`,
-      stt: accounts.length + 1,
-      name: req.name,
-      email: req.email,
-      phone: req.phone,
-      role: "Cộng tác viên",
-      status: "Vô hiệu hóa",
-      registerDate: req.submittedAt.split(" ")[0],
-      initials: req.initials,
-      cctvCode: `CTV-2026-${Math.floor(100 + Math.random() * 900)}`,
-      joinDate: new Date().toLocaleDateString("vi-VN"),
-      shiftsCompleted: 0,
-      rating: 5.0,
-      dob: req.dob,
-      address: req.address,
-      cccdFront: req.cccdFront,
-      cccdBack: req.cccdBack,
-      cvFile: req.cvFile,
-      cvFileName: req.cvFileName,
-      cvFileSize: req.cvFileSize,
-    };
-    setAccounts((prev) => [newAcc, ...prev]);
-    if (reason) {
-      showToast(`Đã từ chối hồ sơ của ${req.name} (Lý do: "${reason}")`);
-    } else {
-      showToast(`Đã từ chối hồ sơ của ${req.name} và lưu vào Danh sách tài khoản (Vô hiệu hóa)`);
+    if (selectedRequest?.id === id) {
+      setSelectedRequest(null);
     }
+    showToast(`Đã từ chối và loại bỏ hồ sơ đăng ký của ${req.name}`);
   };
 
   // Shift Operations
@@ -612,6 +619,7 @@ export const App: React.FC = () => {
                 onDeleteAccount={handleDeleteAccount}
                 onViewAccountDetail={(acc) => setSelectedAccountDetail(acc)}
                 onChangeRole={handleChangeRole}
+                onResetPassword={handleResetPassword}
               />
             )}
 
@@ -689,11 +697,7 @@ export const App: React.FC = () => {
                 }}
                 onUpdateCvFile={(cvData) => {
                   if (!cvData) {
-                    handleSaveProfile({
-                      cvFile: undefined,
-                      cvFileName: undefined,
-                      cvFileSize: undefined,
-                    });
+                    handleSaveProfile({ cvFile: undefined, cvFileName: undefined, cvFileSize: undefined });
                     showToast("Đã xóa file CV");
                   } else {
                     handleSaveProfile({
@@ -728,25 +732,8 @@ export const App: React.FC = () => {
         request={selectedRequest}
         onClose={() => setSelectedRequest(null)}
         onApprove={handleApproveRequest}
-        onReject={(id) => {
-          const req = requests.find((r) => r.id === id);
-          if (req) {
-            setSelectedRequest(null);
-            setRejectingRequestModal(req);
-          }
-        }}
+        onReject={handleRejectRequest}
       />
-
-      {rejectingRequestModal && (
-        <RejectReasonModal
-          request={rejectingRequestModal}
-          onClose={() => setRejectingRequestModal(null)}
-          onConfirmReject={(id, reason) => {
-            handleRejectRequest(id, reason);
-            setRejectingRequestModal(null);
-          }}
-        />
-      )}
 
       <ViewAccountDetailModal
         account={selectedAccountDetail}
@@ -755,6 +742,7 @@ export const App: React.FC = () => {
         onToggleStatus={handleToggleAccountStatus}
         onSaveNotes={handleSaveAccountNotes}
         onEndSchedule={handleEndAccountSchedule}
+        onResetPassword={handleResetPassword}
       />
 
       <EditProfileModal

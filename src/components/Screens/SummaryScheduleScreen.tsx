@@ -395,7 +395,7 @@ export const SummaryScheduleScreen: React.FC<SummaryScheduleScreenProps> = ({
                     return (
                       <div
                         key={colIdx}
-                        className={`min-h-[110px] p-3 rounded-xl border transition-all flex flex-col justify-between ${
+                        className={`min-h-[110px] p-3 rounded-xl border transition-all flex flex-col ${
                           cell.isToday
                             ? "border-blue-700 bg-blue-50/40 ring-2 ring-blue-700/20 dark:border-blue-500 dark:bg-blue-950/20"
                             : "bg-white dark:bg-[#222327] border-slate-200/90 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700"
@@ -416,7 +416,7 @@ export const SummaryScheduleScreen: React.FC<SummaryScheduleScreenProps> = ({
                         {/* Shift Action Buttons inside Day Cell */}
                         <div className="space-y-1.5 min-h-[58px] flex flex-col justify-start">
                           {/* Ca Sáng Button */}
-                          {morningCTVs.length > 0 && (
+                          {morningCTVs.length > 0 ? (
                             <button
                               type="button"
                               onClick={() =>
@@ -439,10 +439,12 @@ export const SummaryScheduleScreen: React.FC<SummaryScheduleScreenProps> = ({
                                 {morningCTVs.length} CTV
                               </span>
                             </button>
-                          )}
+                          ) : afternoonCTVs.length > 0 ? (
+                            <div className="h-[32px]" aria-hidden="true" />
+                          ) : null}
 
                           {/* Ca Chiều Button */}
-                          {afternoonCTVs.length > 0 && (
+                          {afternoonCTVs.length > 0 ? (
                             <button
                               type="button"
                               onClick={() =>
@@ -465,7 +467,9 @@ export const SummaryScheduleScreen: React.FC<SummaryScheduleScreenProps> = ({
                                 {afternoonCTVs.length} CTV
                               </span>
                             </button>
-                          )}
+                          ) : morningCTVs.length > 0 ? (
+                            <div className="h-[32px]" aria-hidden="true" />
+                          ) : null}
                         </div>
                       </div>
                     );
