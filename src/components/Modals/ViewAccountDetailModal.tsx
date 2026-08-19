@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { UserAccount, ShiftSlot } from "../../types";
 import { formatPhoneNumber } from "../../utils/formatters";
+import { ResetPasswordModal } from "./ResetPasswordModal";
 
 interface ViewAccountDetailModalProps {
   account: UserAccount | null;
@@ -9,6 +10,7 @@ interface ViewAccountDetailModalProps {
   onToggleStatus: (id: string) => void;
   onSaveNotes?: (id: string, notes: string) => void;
   onEndSchedule?: (id: string, startDate: string, endDate: string, reason: string) => void;
+  onResetPassword?: (id: string, newPassword: string, requireChangeOnLogin: boolean) => void;
 }
 
 const DEFAULT_CCCD_FRONT =
@@ -30,6 +32,7 @@ export const ViewAccountDetailModal: React.FC<ViewAccountDetailModalProps> = ({
   onClose,
   onSaveNotes,
   onEndSchedule,
+  onResetPassword,
 }) => {
   const [previewImg, setPreviewImg] = useState<{ title: string; url: string } | null>(null);
   const [previewDoc, setPreviewDoc] = useState<{
@@ -50,6 +53,7 @@ export const ViewAccountDetailModal: React.FC<ViewAccountDetailModalProps> = ({
   );
   const [endScheduleReason, setEndScheduleReason] = useState("");
   const [endScheduleError, setEndScheduleError] = useState("");
+  const [isResetPasswordOpen, setIsResetPasswordOpen] = useState(false);
 
   useEffect(() => {
     setNotesText(account?.notes || "");
@@ -367,13 +371,24 @@ LỊCH SỬ HOẠT ĐỘNG:
               </div>
             </div>
 
-            <div className="text-left sm:text-right text-xs text-[#74777f] dark:text-[#c4c6cf]">
+            <div className="flex flex-col sm:items-end gap-2 text-xs text-[#74777f] dark:text-[#c4c6cf]">
               <p>
                 Ngày đăng ký:{" "}
                 <span className="font-semibold text-[#1b365d] dark:text-white">
                   {account.registerDate || account.joinDate || "15/05/2023"}
                 </span>
               </p>
+              {account.role !== "Admin" && (
+                <button
+                  type="button"
+                  onClick={() => setIsResetPasswordOpen(true)}
+                  className="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800/80 rounded-lg font-bold flex items-center gap-1.5 transition-colors cursor-pointer text-xs"
+                  title="Đặt lại mật khẩu mặc định mới cho CTV"
+                >
+                  <span className="material-symbols-outlined text-[16px]">lock_reset</span>
+                  <span>Đặt lại mật khẩu</span>
+                </button>
+              )}
             </div>
           </div>
 
@@ -623,9 +638,7 @@ LỊCH SỬ HOẠT ĐỘNG:
                           <div className="space-y-2">
                             {morning !== "off" ? (
                               <div
-                                title={
-                                  morning === "pending" ? "Ca sáng: Chờ duyệt" : "Ca sáng: Đi làm"
-                                }
+                                title={morning === "pending" ? "Ca sáng: Chờ duyệt" : "Ca sáng: Đi làm"}
                                 className={`flex w-full items-center gap-2 whitespace-nowrap rounded-xl border px-3 py-2 text-xs font-bold shadow-xs ${
                                   morning === "pending"
                                     ? "border-amber-300 bg-amber-100 text-amber-900 dark:border-amber-700 dark:bg-amber-900/50 dark:text-amber-100"
@@ -709,7 +722,9 @@ LỊCH SỬ HOẠT ĐỘNG:
                 className="w-full text-xs p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-[#25262b] text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition-all resize-none shadow-2xs leading-relaxed"
               />
             </div>
+
           </div>
+
         </div>
       </div>
 
@@ -739,6 +754,9 @@ LỊCH SỬ HOẠT ĐỘNG:
                 <span className="material-symbols-outlined text-[20px]">close</span>
               </button>
             </div>
+
+
+
 
             {/* Explanation card */}
             <div className="p-3 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/60 rounded-xl text-amber-800 dark:text-amber-300 text-xs flex items-start gap-2.5">
@@ -1020,6 +1038,7 @@ LỊCH SỬ HOẠT ĐỘNG:
                 </div>
               </div>
             </div>
+
           </div>
         </div>
       )}
@@ -1133,32 +1152,32 @@ LỊCH SỬ HOẠT ĐỘNG:
 
                             <div className="space-y-2 flex-1">
                               {morningShift ? (
-                                <div className="flex w-full items-center gap-2 rounded-xl border border-amber-200/90 bg-amber-50 px-3 py-2 text-xs font-bold text-amber-900 shadow-xs select-none pointer-events-none transition-colors dark:border-amber-800/50 dark:bg-amber-950/40 dark:text-amber-200">
+                                <div
+                                  className="flex w-full items-center gap-2 rounded-xl border border-amber-200/90 bg-amber-50 px-3 py-2 text-xs font-bold text-amber-900 shadow-xs select-none pointer-events-none transition-colors dark:border-amber-800/50 dark:bg-amber-950/40 dark:text-amber-200"
+                                >
                                   <span
                                     className="material-symbols-outlined text-[18px] text-amber-700 dark:text-amber-400"
                                     aria-hidden="true"
                                   >
                                     wb_sunny
                                   </span>
-                                  <span className="text-amber-900 dark:text-amber-100">
-                                    Ca Sáng
-                                  </span>
+                                  <span className="text-amber-900 dark:text-amber-100">Ca Sáng</span>
                                 </div>
                               ) : afternoonShift ? (
                                 <div className="h-[38px]" aria-hidden="true" />
                               ) : null}
 
                               {afternoonShift && (
-                                <div className="flex w-full items-center gap-2 rounded-xl border border-purple-200/90 bg-purple-50 px-3 py-2 text-xs font-bold text-purple-900 shadow-xs select-none pointer-events-none transition-colors dark:border-purple-800/50 dark:bg-purple-950/40 dark:text-purple-200">
+                                <div
+                                  className="flex w-full items-center gap-2 rounded-xl border border-purple-200/90 bg-purple-50 px-3 py-2 text-xs font-bold text-purple-900 shadow-xs select-none pointer-events-none transition-colors dark:border-purple-800/50 dark:bg-purple-950/40 dark:text-purple-200"
+                                >
                                   <span
                                     className="material-symbols-outlined text-[18px] text-purple-700 dark:text-purple-400"
                                     aria-hidden="true"
                                   >
                                     wb_twilight
                                   </span>
-                                  <span className="text-purple-900 dark:text-purple-100">
-                                    Ca Chiều
-                                  </span>
+                                  <span className="text-purple-900 dark:text-purple-100">Ca Chiều</span>
                                 </div>
                               )}
                             </div>
@@ -1172,6 +1191,19 @@ LỊCH SỬ HOẠT ĐỘNG:
             </div>
           </div>
         </div>
+      )}
+
+      {/* Reset Password Modal */}
+      {isResetPasswordOpen && account && (
+        <ResetPasswordModal
+          account={account}
+          onClose={() => setIsResetPasswordOpen(false)}
+          onConfirmReset={(id, newPassword, requireChange) => {
+            if (onResetPassword) {
+              onResetPassword(id, newPassword, requireChange);
+            }
+          }}
+        />
       )}
     </div>
   );

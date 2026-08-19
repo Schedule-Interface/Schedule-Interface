@@ -17,6 +17,8 @@ const DEFAULT_CCCD_BACK =
 export const ViewRequestModal: React.FC<ViewRequestModalProps> = ({
   request,
   onClose,
+  onApprove,
+  onReject,
 }) => {
   const [previewImg, setPreviewImg] = useState<{ title: string; url: string } | null>(null);
 
@@ -216,7 +218,32 @@ export const ViewRequestModal: React.FC<ViewRequestModalProps> = ({
               </div>
             )}
           </div>
+        </div>
 
+        {/* Actions Footer */}
+        <div className="p-4 border-t border-[#E2E8F0] bg-[#F8FAFC] flex items-center justify-end gap-2.5">
+          <button
+            type="button"
+            onClick={() => {
+              onReject(request.id);
+              onClose();
+            }}
+            className="px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-xl text-xs font-bold transition-colors cursor-pointer flex items-center gap-1.5"
+          >
+            <span className="material-symbols-outlined text-[16px]">cancel</span>
+            <span>Từ chối hồ sơ</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              onApprove(request.id);
+              onClose();
+            }}
+            className="px-4 py-2 bg-[#16A34A] hover:bg-[#15803D] text-white rounded-xl text-xs font-bold transition-colors cursor-pointer flex items-center gap-1.5 shadow-xs"
+          >
+            <span className="material-symbols-outlined text-[16px]">check_circle</span>
+            <span>Phê duyệt</span>
+          </button>
         </div>
       </div>
 

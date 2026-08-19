@@ -1,12 +1,11 @@
 import React, { useState } from "react";
 import { RegistrationRequest } from "../../types";
 import { formatPhoneNumber, formatDateOnly } from "../../utils/formatters";
-import { RejectReasonModal } from "../Modals/RejectReasonModal";
 
 interface RequestsScreenProps {
   requests: RegistrationRequest[];
   onApproveRequest: (id: string) => void;
-  onRejectRequest: (id: string, reason?: string) => void;
+  onRejectRequest: (id: string) => void;
   onViewRequestDetail: (req: RegistrationRequest) => void;
 }
 
@@ -18,7 +17,6 @@ export const RequestsScreen: React.FC<RequestsScreenProps> = ({
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [rejectingRequest, setRejectingRequest] = useState<RegistrationRequest | null>(null);
   const itemsPerPage = 5;
 
   // Filter requests (only show pending 'Chờ duyệt' requests)
@@ -160,9 +158,9 @@ export const RequestsScreen: React.FC<RequestsScreenProps> = ({
                               </span>
                             </button>
                             <button
-                              onClick={() => setRejectingRequest(req)}
+                              onClick={() => onRejectRequest(req.id)}
                               className="p-1.5 text-[#DC2626] hover:bg-[#ffdad6] rounded transition-colors cursor-pointer"
-                              title="Từ chối hồ sơ (Nhập lý do)"
+                              title="Từ chối và loại bỏ hồ sơ"
                             >
                               <span className="material-symbols-outlined text-[20px]">cancel</span>
                             </button>
@@ -212,18 +210,6 @@ export const RequestsScreen: React.FC<RequestsScreenProps> = ({
           </div>
         </div>
       </div>
-
-      {/* Reject Reason Modal */}
-      {rejectingRequest && (
-        <RejectReasonModal
-          request={rejectingRequest}
-          onClose={() => setRejectingRequest(null)}
-          onConfirmReject={(id, reason) => {
-            onRejectRequest(id, reason);
-            setRejectingRequest(null);
-          }}
-        />
-      )}
     </div>
   );
 };

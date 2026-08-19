@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { UserAccount, UserRole } from "../../types";
 import { formatPhoneNumber } from "../../utils/formatters";
+import { ResetPasswordModal } from "../Modals/ResetPasswordModal";
 
 interface AccountListScreenProps {
   accounts: UserAccount[];
@@ -9,6 +10,7 @@ interface AccountListScreenProps {
   onDeleteAccount: (id: string) => void;
   onViewAccountDetail: (account: UserAccount) => void;
   onChangeRole?: (id: string, newRole: UserRole) => void;
+  onResetPassword?: (id: string, newPassword: string, requireChangeOnLogin: boolean) => void;
 }
 
 export const AccountListScreen: React.FC<AccountListScreenProps> = ({
@@ -16,6 +18,7 @@ export const AccountListScreen: React.FC<AccountListScreenProps> = ({
   onToggleAccountStatus,
   onDeleteAccount,
   onViewAccountDetail,
+  onResetPassword,
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -24,6 +27,7 @@ export const AccountListScreen: React.FC<AccountListScreenProps> = ({
   // Confirm Modals state
   const [accountToToggle, setAccountToToggle] = useState<UserAccount | null>(null);
   const [accountToDelete, setAccountToDelete] = useState<UserAccount | null>(null);
+  const [accountToResetPassword, setAccountToResetPassword] = useState<UserAccount | null>(null);
 
   // Filter out Admin accounts strictly (Only display Cộng tác viên accounts)
   const ctvAccounts = accounts.filter((acc) => acc.role !== "Admin");
@@ -161,6 +165,13 @@ export const AccountListScreen: React.FC<AccountListScreenProps> = ({
                     <td className="py-3.5 px-4 text-right">
                       {acc.role !== "Admin" && (
                         <div className="flex items-center justify-end gap-1 opacity-90 group-hover:opacity-100 transition-opacity">
+                          <button
+                            onClick={() => setAccountToResetPassword(acc)}
+                            className="p-1.5 text-[#44474e] hover:text-[#1b365d] hover:bg-[#d8e2f9] rounded transition-colors cursor-pointer"
+                            title="Đặt lại mật khẩu mặc định (Quên MK)"
+                          >
+                            <span className="material-symbols-outlined text-[20px]">lock_reset</span>
+                          </button>
                           <button
                             onClick={() => setAccountToToggle(acc)}
                             className={`p-1.5 rounded transition-colors cursor-pointer ${
@@ -314,6 +325,19 @@ export const AccountListScreen: React.FC<AccountListScreenProps> = ({
             </div>
           </div>
         </div>
+      )}
+
+      {/* Reset Password Modal */}
+      {accountToResetPassword && (
+        <ResetPasswordModal
+          account={accountToResetPassword}
+          onClose={() => setAccountToResetPassword(null)}
+          onConfirmReset={(id, newPassword, requireChange) => {
+            if (onResetPassword) {
+              onResetPassword(id, newPassword, requireChange);
+            }
+          }}
+        />
       )}
     </div>
   );

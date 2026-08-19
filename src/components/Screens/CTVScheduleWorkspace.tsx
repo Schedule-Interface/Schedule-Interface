@@ -677,11 +677,7 @@ export const CTVScheduleWorkspace: React.FC<CTVScheduleWorkspaceProps> = ({
   const selectedShiftDate = selectedShift ? resolveShiftDate(selectedShift) : "";
   const canCancelSelectedShift = Boolean(selectedShift) && selectedShiftDate >= todayISO;
 
-  const renderShiftCard = (
-    shift: ShiftSlot,
-    _compact = false,
-    _showShiftLabel = false,
-  ) => {
+  const renderShiftCard = (shift: ShiftSlot, _compact = false, _showShiftLabel = false) => {
     const meta = getShiftMeta(shift.shiftType as ShiftType);
 
     return (
@@ -743,12 +739,13 @@ export const CTVScheduleWorkspace: React.FC<CTVScheduleWorkspaceProps> = ({
 
           <div className="flex items-center gap-2">
             <div className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-800 shadow-2xs dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100">
-              <span className="material-symbols-outlined text-[18px] text-blue-600 dark:text-blue-400" aria-hidden="true">
+              <span
+                className="material-symbols-outlined text-[18px] text-blue-600 dark:text-blue-400"
+                aria-hidden="true"
+              >
                 door_front
               </span>
-              <span className="font-bold text-slate-900 dark:text-slate-100">
-                {room}
-              </span>
+              <span className="font-bold text-slate-900 dark:text-slate-100">{room}</span>
             </div>
           </div>
         </div>
@@ -762,9 +759,7 @@ export const CTVScheduleWorkspace: React.FC<CTVScheduleWorkspaceProps> = ({
               >
                 calendar_view_week
               </span>
-              <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">
-                Lịch tuần
-              </h3>
+              <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">Lịch tuần</h3>
             </div>
 
             <div className="overflow-x-auto">
@@ -826,7 +821,7 @@ export const CTVScheduleWorkspace: React.FC<CTVScheduleWorkspaceProps> = ({
                             <div className="h-[38px]" aria-hidden="true" />
                           ) : null}
 
-                          {afternoonShift && (
+                          {afternoonShift ? (
                             <div className="flex w-full items-center gap-2 rounded-xl border border-purple-200/90 bg-purple-50 px-3 py-2 text-xs font-bold text-purple-900 shadow-xs select-none pointer-events-none transition-colors dark:border-purple-800/50 dark:bg-purple-950/40 dark:text-purple-200">
                               <span
                                 className="material-symbols-outlined text-[18px] text-purple-700 dark:text-purple-400"
@@ -836,7 +831,9 @@ export const CTVScheduleWorkspace: React.FC<CTVScheduleWorkspaceProps> = ({
                               </span>
                               <span className="text-purple-900 dark:text-purple-100">Ca Chiều</span>
                             </div>
-                          )}
+                          ) : morningShift ? (
+                            <div className="h-[38px]" aria-hidden="true" />
+                          ) : null}
                         </div>
                       </div>
                     );
@@ -929,7 +926,7 @@ export const CTVScheduleWorkspace: React.FC<CTVScheduleWorkspaceProps> = ({
                         return (
                           <div
                             key={dateISO}
-                            className={`flex min-h-[110px] flex-col justify-between rounded-xl border p-2.5 transition-all ${isToday ? "border-blue-700 bg-blue-50/40 ring-2 ring-blue-700/20 dark:border-blue-500 dark:bg-blue-950/20" : "border-slate-200/90 bg-white hover:border-slate-300 dark:border-slate-800 dark:bg-[#222327] dark:hover:border-slate-700"}`}
+                            className={`flex min-h-[110px] flex-col rounded-xl border p-2.5 transition-all ${isToday ? "border-blue-700 bg-blue-50/40 ring-2 ring-blue-700/20 dark:border-blue-500 dark:bg-blue-950/20" : "border-slate-200/90 bg-white hover:border-slate-300 dark:border-slate-800 dark:bg-[#222327] dark:hover:border-slate-700"}`}
                           >
                             <div className="mb-2 flex min-h-6 items-center justify-center gap-2 border-b border-slate-100 pb-1.5 text-center dark:border-slate-800/80">
                               <span className="flex items-center justify-center gap-1 text-xs font-bold text-slate-800 dark:text-slate-200">
@@ -955,13 +952,15 @@ export const CTVScheduleWorkspace: React.FC<CTVScheduleWorkspaceProps> = ({
                                   >
                                     wb_sunny
                                   </span>
-                                  <span className="text-amber-900 dark:text-amber-100">Ca Sáng</span>
+                                  <span className="text-amber-900 dark:text-amber-100">
+                                    Ca Sáng
+                                  </span>
                                 </div>
                               ) : afternoonShift ? (
                                 <div className="h-[38px]" aria-hidden="true" />
                               ) : null}
 
-                              {afternoonShift && (
+                              {afternoonShift ? (
                                 <div
                                   key={`${dateISO}-afternoon`}
                                   className="flex w-full items-center gap-2 rounded-xl border border-purple-200/90 bg-purple-50 px-3 py-2 text-xs font-bold text-purple-900 shadow-xs select-none pointer-events-none transition-colors dark:border-purple-800/50 dark:bg-purple-950/40 dark:text-purple-200"
@@ -973,9 +972,13 @@ export const CTVScheduleWorkspace: React.FC<CTVScheduleWorkspaceProps> = ({
                                   >
                                     wb_twilight
                                   </span>
-                                  <span className="text-purple-900 dark:text-purple-100">Ca Chiều</span>
+                                  <span className="text-purple-900 dark:text-purple-100">
+                                    Ca Chiều
+                                  </span>
                                 </div>
-                              )}
+                              ) : morningShift ? (
+                                <div className="h-[38px]" aria-hidden="true" />
+                              ) : null}
                             </div>
                           </div>
                         );
@@ -1027,7 +1030,10 @@ export const CTVScheduleWorkspace: React.FC<CTVScheduleWorkspaceProps> = ({
 
               <div className="space-y-5 p-5">
                 <div>
-                  <label htmlFor="modal-room-select" className="block text-sm font-bold text-slate-900 dark:text-white mb-1.5">
+                  <label
+                    htmlFor="modal-room-select"
+                    className="block text-sm font-bold text-slate-900 dark:text-white mb-1.5"
+                  >
                     Buồng làm việc
                   </label>
                   <div className="relative">
