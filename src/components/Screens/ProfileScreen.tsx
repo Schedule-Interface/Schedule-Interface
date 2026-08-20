@@ -195,31 +195,33 @@ LỊCH SỬ HOẠT ĐỘNG:
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {/* Page Header */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5">
           {isAdminViewing && onBack && (
             <button
               onClick={onBack}
-              className="p-1.5 text-[#44474e] hover:text-[#002046] hover:bg-[#efedf1] rounded-lg transition-colors cursor-pointer"
+              className="p-1.5 text-[#44474e] dark:text-[#c4c6cf] hover:text-[#002046] dark:hover:text-white hover:bg-[#efedf1] dark:hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
               title="Quay lại"
             >
-              <span className="material-symbols-outlined text-[24px]">arrow_back</span>
+              <span className="material-symbols-outlined text-[22px]">arrow_back</span>
             </button>
           )}
-          <h2 className="text-2xl font-bold text-[#1a1b1e] tracking-tight">Thông tin tài khoản</h2>
+          <h2 className="text-2xl font-bold text-[#1a1b1e] dark:text-white tracking-tight">
+            Thông tin tài khoản
+          </h2>
         </div>
       </div>
 
-      {/* Main Content Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* Left Column (4 cols): Profile Card */}
-        <div className="lg:col-span-4">
-          <div className="bg-white dark:bg-[#25262b] border border-[#E2E8F0] dark:border-[#3b3d45] rounded-2xl p-6 shadow-xs flex flex-col items-center text-center relative">
+      {/* Main Content Layout: 2 Columns on Desktop & Tablet, 1 Column on Mobile */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
+        {/* Left Column (4 cols): Hồ sơ cá nhân (Avatar + Tên + CCCD) */}
+        <div className="lg:col-span-4 flex flex-col">
+          <div className="bg-white dark:bg-[#25262b] border border-[#E2E8F0] dark:border-[#3b3d45] rounded-2xl p-5 shadow-xs flex flex-col items-center text-center relative h-full">
             {/* Interactive Avatar Container */}
             <div
-              className="relative mb-4 group cursor-pointer"
+              className="relative mb-3 group cursor-pointer"
               onClick={() => {
                 if (user.avatar) {
                   setPreviewModal({ title: "Ảnh đại diện", url: user.avatar, side: "avatar" });
@@ -232,16 +234,16 @@ LỊCH SỬ HOẠT ĐỘNG:
                 <img
                   src={user.avatar}
                   alt={user.name}
-                  className="w-28 h-28 rounded-full object-cover border-4 border-white dark:border-[#1a1b1e] shadow-md transition-all group-hover:brightness-90"
+                  className="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover border-4 border-white dark:border-[#1a1b1e] shadow-md transition-all group-hover:brightness-90"
                 />
               ) : (
-                <div className="w-28 h-28 rounded-full bg-[#1b365d] text-white flex items-center justify-center text-3xl font-bold border-4 border-white dark:border-[#1a1b1e] shadow-md transition-all group-hover:brightness-90">
+                <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-[#1b365d] text-white flex items-center justify-center text-2xl sm:text-3xl font-bold border-4 border-white dark:border-[#1a1b1e] shadow-md transition-all group-hover:brightness-90">
                   {user.initials || user.name.slice(0, 2).toUpperCase()}
                 </div>
               )}
 
               {/* Edit Camera Badge */}
-              <div className="absolute bottom-0 right-0 bg-accent hover:opacity-90 text-white p-2 rounded-full border-2 border-white dark:border-[#1a1b1e] shadow-sm flex items-center justify-center transition-transform group-hover:scale-110">
+              <div className="absolute bottom-0 right-0 bg-accent hover:opacity-90 text-white p-1.5 sm:p-2 rounded-full border-2 border-white dark:border-[#1a1b1e] shadow-sm flex items-center justify-center transition-transform group-hover:scale-110">
                 <span className="material-symbols-outlined text-[16px]">photo_camera</span>
               </div>
             </div>
@@ -254,7 +256,9 @@ LỊCH SỬ HOẠT ĐỘNG:
               onChange={handleFileSelect}
             />
 
-            <h3 className="text-xl font-bold text-[#1a1b1e] dark:text-white">{user.name}</h3>
+            <h3 className="text-lg sm:text-xl font-bold text-[#1a1b1e] dark:text-white">
+              {user.name}
+            </h3>
 
             {/* Hidden inputs for CCCD and CV */}
             <input
@@ -280,17 +284,17 @@ LỊCH SỬ HOẠT ĐỘNG:
             />
 
             {/* CCCD Photos Section */}
-            <div className="w-full mt-5 pt-4 border-t border-[#E2E8F0] dark:border-[#3b3d45] text-left">
-              <div className="flex items-center justify-between mb-3">
+            <div className="w-full mt-4 pt-3.5 border-t border-[#E2E8F0] dark:border-[#3b3d45] text-left">
+              <div className="flex items-center justify-between mb-2.5">
                 <span className="text-xs font-bold text-[#1b365d] dark:text-[#87a0cd] uppercase tracking-wider flex items-center gap-1.5">
-                  <span className="material-symbols-outlined text-[18px]">badge</span>
+                  <span className="material-symbols-outlined text-[17px]">badge</span>
                   <span>Ảnh chụp CCCD</span>
                 </span>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full">
+              <div className="grid grid-cols-2 gap-2.5 w-full">
                 {/* CCCD Mặt trước */}
-                <div className="flex flex-col gap-1.5">
+                <div className="flex flex-col gap-1">
                   <span className="text-[11px] font-semibold text-slate-600 dark:text-slate-300">
                     Mặt trước
                   </span>
@@ -304,23 +308,28 @@ LỊCH SỬ HOẠT ĐỘNG:
                           side: "front",
                         })
                       }
-                      className="relative group rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-[#1a1b1e] overflow-hidden h-28 cursor-pointer shadow-2xs"
+                      className="relative group rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-[#1a1b1e] overflow-hidden h-28 sm:h-32 cursor-pointer shadow-2xs"
                     >
                       <img
                         src={user.cccdFront}
                         alt="CCCD Mặt trước"
                         className="w-full h-full object-cover transition-transform duration-200 group-hover:scale-105"
                       />
+                      <div className="absolute inset-0 bg-black/25 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <span className="p-1 rounded-full bg-white/90 text-slate-800 text-[15px] material-symbols-outlined shadow-xs">
+                          zoom_in
+                        </span>
+                      </div>
                     </div>
                   ) : (
                     <div
                       onClick={() => cccdFrontInputRef.current?.click()}
-                      className="h-28 rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-700 bg-slate-50/60 dark:bg-[#1a1b1e]/60 hover:bg-blue-50/50 dark:hover:bg-blue-950/20 hover:border-blue-400 transition-all cursor-pointer flex flex-col items-center justify-center p-2 text-center group/empty"
+                      className="h-28 sm:h-32 rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-700 bg-slate-50/60 dark:bg-[#1a1b1e]/60 hover:bg-blue-50/50 dark:hover:bg-blue-950/20 hover:border-blue-400 transition-all cursor-pointer flex flex-col items-center justify-center p-2 text-center group/empty"
                     >
-                      <span className="material-symbols-outlined text-slate-400 group-hover/empty:text-blue-500 text-[24px] mb-1 transition-colors">
+                      <span className="material-symbols-outlined text-slate-400 group-hover/empty:text-blue-500 text-[22px] mb-1 transition-colors">
                         add_a_photo
                       </span>
-                      <span className="text-xs font-medium text-slate-400 dark:text-slate-500 group-hover/empty:text-blue-500 transition-colors">
+                      <span className="text-[11px] font-medium text-slate-400 dark:text-slate-500 group-hover/empty:text-blue-500 transition-colors">
                         Tải ảnh lên
                       </span>
                     </div>
@@ -328,7 +337,7 @@ LỊCH SỬ HOẠT ĐỘNG:
                 </div>
 
                 {/* CCCD Mặt sau */}
-                <div className="flex flex-col gap-1.5">
+                <div className="flex flex-col gap-1">
                   <span className="text-[11px] font-semibold text-slate-600 dark:text-slate-300">
                     Mặt sau
                   </span>
@@ -342,23 +351,28 @@ LỊCH SỬ HOẠT ĐỘNG:
                           side: "back",
                         })
                       }
-                      className="relative group rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-[#1a1b1e] overflow-hidden h-28 cursor-pointer shadow-2xs"
+                      className="relative group rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-[#1a1b1e] overflow-hidden h-28 sm:h-32 cursor-pointer shadow-2xs"
                     >
                       <img
                         src={user.cccdBack}
                         alt="CCCD Mặt sau"
                         className="w-full h-full object-cover transition-transform duration-200 group-hover:scale-105"
                       />
+                      <div className="absolute inset-0 bg-black/25 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <span className="p-1 rounded-full bg-white/90 text-slate-800 text-[15px] material-symbols-outlined shadow-xs">
+                          zoom_in
+                        </span>
+                      </div>
                     </div>
                   ) : (
                     <div
                       onClick={() => cccdBackInputRef.current?.click()}
-                      className="h-28 rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-700 bg-slate-50/60 dark:bg-[#1a1b1e]/60 hover:bg-blue-50/50 dark:hover:bg-blue-950/20 hover:border-blue-400 transition-all cursor-pointer flex flex-col items-center justify-center p-2 text-center group/empty"
+                      className="h-28 sm:h-32 rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-700 bg-slate-50/60 dark:bg-[#1a1b1e]/60 hover:bg-blue-50/50 dark:hover:bg-blue-950/20 hover:border-blue-400 transition-all cursor-pointer flex flex-col items-center justify-center p-2 text-center group/empty"
                     >
-                      <span className="material-symbols-outlined text-slate-400 group-hover/empty:text-blue-500 text-[24px] mb-1 transition-colors">
+                      <span className="material-symbols-outlined text-slate-400 group-hover/empty:text-blue-500 text-[22px] mb-1 transition-colors">
                         add_a_photo
                       </span>
-                      <span className="text-xs font-medium text-slate-400 dark:text-slate-500 group-hover/empty:text-blue-500 transition-colors">
+                      <span className="text-[11px] font-medium text-slate-400 dark:text-slate-500 group-hover/empty:text-blue-500 transition-colors">
                         Tải ảnh lên
                       </span>
                     </div>
@@ -366,115 +380,29 @@ LỊCH SỬ HOẠT ĐỘNG:
                 </div>
               </div>
             </div>
-
-            {/* Hồ sơ ứng tuyển (CV) Section */}
-            <div className="w-full mt-5 pt-4 border-t border-[#E2E8F0] dark:border-[#3b3d45] text-left">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-bold text-[#1b365d] dark:text-[#87a0cd] uppercase tracking-wider flex items-center gap-1.5">
-                  <span className="material-symbols-outlined text-[18px]">description</span>
-                  <span>Hồ sơ ứng tuyển (CV)</span>
-                </span>
-              </div>
-
-              {hasCv ? (
-                <div className="p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-[#1a1b1e] space-y-2.5 shadow-2xs">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div
-                      className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-2xs ${
-                        isPdf
-                          ? "bg-red-50 text-red-600 border border-red-200/80 dark:bg-red-950/50 dark:text-red-300 dark:border-red-900/60"
-                          : "bg-blue-50 text-blue-600 border border-blue-200/80 dark:bg-blue-950/50 dark:text-blue-300 dark:border-blue-900/60"
-                      }`}
-                    >
-                      <span className="material-symbols-outlined text-[22px]">
-                        {isPdf ? "picture_as_pdf" : "description"}
-                      </span>
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p
-                        className="text-xs font-bold text-[#1a1b1e] dark:text-white truncate"
-                        title={cvDisplayName}
-                      >
-                        {cvDisplayName}
-                      </p>
-                      <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-                        {cvDisplaySize}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Action Buttons Grid (Xem & Thay đổi) */}
-                  <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-200/70 dark:border-slate-700/70">
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setPreviewDocModal({
-                          fileName: cvDisplayName,
-                          fileSize: cvDisplaySize,
-                          fileUrl: user.cvFile,
-                          isPdf,
-                        })
-                      }
-                      className="px-2 py-2 bg-white hover:bg-slate-100 dark:bg-[#25262b] dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
-                      title="Xem trước tài liệu"
-                    >
-                      <span className="material-symbols-outlined text-[17px] text-blue-600">
-                        visibility
-                      </span>
-                      <span>Xem</span>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => cvFileInputRef.current?.click()}
-                      className="px-2 py-2 bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/40 dark:hover:bg-blue-900/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
-                      title="Chọn file mới thay thế"
-                    >
-                      <span className="material-symbols-outlined text-[17px]">upload_file</span>
-                      <span>Thay đổi</span>
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <div
-                  onClick={() => cvFileInputRef.current?.click()}
-                  className="rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-700 bg-slate-50/60 dark:bg-[#1a1b1e]/60 hover:bg-blue-50/50 dark:hover:bg-blue-950/20 hover:border-blue-400 transition-all cursor-pointer p-4 text-center group/cv"
-                >
-                  <div className="w-10 h-10 mx-auto mb-2 rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center group-hover/cv:scale-110 transition-transform">
-                    <span className="material-symbols-outlined text-[22px]">upload_file</span>
-                  </div>
-                  <p className="text-xs font-bold text-slate-700 dark:text-slate-200 group-hover/cv:text-blue-600 transition-colors">
-                    Tải file CV lên
-                  </p>
-                  <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">
-                    Định dạng PDF, Word (.pdf, .doc, .docx)
-                  </p>
-                </div>
-              )}
-            </div>
           </div>
         </div>
 
-        {/* Right Column (8 cols): Detail Info Frame */}
-        <div className="lg:col-span-8 flex flex-col gap-6">
-          <div className="bg-white border border-[#E2E8F0] rounded-xl shadow-xs overflow-hidden">
+        {/* Right Column (8 cols): Thông tin chi tiết + Thông tin tài khoản + Hồ sơ CV */}
+        <div className="lg:col-span-8 flex flex-col">
+          <div className="bg-white dark:bg-[#25262b] border border-[#E2E8F0] dark:border-[#3b3d45] rounded-2xl shadow-xs overflow-hidden h-full flex flex-col">
             {/* Header & Actions */}
-            <div className="bg-[#F8FAFC] px-6 py-4 border-b border-[#E2E8F0] flex flex-wrap items-center justify-between gap-3">
-              <h3 className="font-bold text-base text-[#1a1b1e] flex items-center gap-2">
-                <span className="material-symbols-outlined text-[#002046]">badge</span>
+            <div className="bg-[#F8FAFC] dark:bg-[#1f2023] px-5 py-3.5 border-b border-[#E2E8F0] dark:border-[#3b3d45] flex flex-wrap items-center justify-between gap-3">
+              <h3 className="font-bold text-sm sm:text-base text-[#1a1b1e] dark:text-[#d6e3ff] flex items-center gap-2">
+                <span className="material-symbols-outlined text-accent text-[20px]">badge</span>
                 <span>Thông tin chi tiết</span>
               </h3>
               <div className="flex items-center gap-2">
                 <button
                   onClick={onOpenChangePassword}
-                  className="px-3 py-1.5 border border-accent text-accent font-semibold text-xs rounded hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs"
+                  className="px-3 py-1.5 border border-accent text-accent font-semibold text-xs rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs"
                 >
                   <span className="material-symbols-outlined text-[16px]">lock_reset</span>
                   <span>Đổi mật khẩu</span>
                 </button>
                 <button
                   onClick={onOpenEditProfile}
-                  className="px-3 py-1.5 bg-accent text-white font-semibold text-xs rounded hover:opacity-90 transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs"
+                  className="px-3 py-1.5 bg-accent text-white font-semibold text-xs rounded-lg hover:opacity-90 transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs"
                 >
                   <span className="material-symbols-outlined text-[16px]">edit</span>
                   <span>Chỉnh sửa thông tin</span>
@@ -482,41 +410,48 @@ LỊCH SỬ HOẠT ĐỘNG:
               </div>
             </div>
 
-            <div className="p-6 space-y-6">
+            <div className="p-5 space-y-4 sm:space-y-4 flex-1 flex flex-col justify-between">
               {/* Nhóm 1: Thông tin cá nhân */}
               <div>
-                <h4 className="text-xs font-bold text-[#002046] uppercase tracking-wider mb-4 pb-2 border-b border-[#E2E8F0]">
+                <h4 className="text-xs font-bold text-[#002046] dark:text-[#87a0cd] uppercase tracking-wider mb-2.5 pb-1.5 border-b border-[#E2E8F0] dark:border-[#3b3d45]">
                   Thông tin cá nhân
                 </h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
                   <div>
-                    <label className="block text-[11px] font-semibold text-[#74777f] mb-1">
+                    <label className="block text-[11px] font-semibold text-[#74777f] dark:text-[#8e9099] mb-0.5">
                       Họ và tên
                     </label>
-                    <p className="text-sm font-semibold text-[#1a1b1e]">{user.name}</p>
-                  </div>
-
-                  <div>
-                    <label className="block text-[11px] font-semibold text-[#74777f] mb-1">
-                      Ngày sinh
-                    </label>
-                    <p className="text-sm font-semibold text-[#1a1b1e]">
-                      {user.dob || "15/08/1998"}
+                    <p className="text-sm font-semibold text-[#1a1b1e] dark:text-white">
+                      {user.name}
                     </p>
                   </div>
 
                   <div>
-                    <label className="block text-[11px] font-semibold text-[#74777f] mb-1">
-                      Email
+                    <label className="block text-[11px] font-semibold text-[#74777f] dark:text-[#8e9099] mb-0.5">
+                      Ngày sinh
                     </label>
-                    <p className="text-sm font-semibold text-[#1a1b1e]">{user.email}</p>
+                    <p className="text-sm font-semibold text-[#1a1b1e] dark:text-white">
+                      {user.dob || "15/08/1990"}
+                    </p>
                   </div>
 
                   <div>
-                    <label className="block text-[11px] font-semibold text-[#74777f] mb-1">
+                    <label className="block text-[11px] font-semibold text-[#74777f] dark:text-[#8e9099] mb-0.5">
+                      Email
+                    </label>
+                    <p
+                      className="text-sm font-semibold text-[#1a1b1e] dark:text-white truncate"
+                      title={user.email}
+                    >
+                      {user.email}
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-semibold text-[#74777f] dark:text-[#8e9099] mb-0.5">
                       Số điện thoại
                     </label>
-                    <p className="text-sm font-semibold text-[#1a1b1e]">
+                    <p className="text-sm font-semibold text-[#1a1b1e] dark:text-white">
                       {formatPhoneNumber(user.phone)}
                     </p>
                   </div>
@@ -525,33 +460,125 @@ LỊCH SỬ HOẠT ĐỘNG:
 
               {/* Nhóm 2: Thông tin tài khoản */}
               <div>
-                <h4 className="text-xs font-bold text-[#002046] uppercase tracking-wider mb-4 pb-2 border-b border-[#E2E8F0]">
+                <h4 className="text-xs font-bold text-[#002046] dark:text-[#87a0cd] uppercase tracking-wider mb-2.5 pb-1.5 border-b border-[#E2E8F0] dark:border-[#3b3d45]">
                   Thông tin tài khoản
                 </h4>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
                   <div>
-                    <label className="block text-[11px] font-semibold text-[#74777f] mb-1">
+                    <label className="block text-[11px] font-semibold text-[#74777f] dark:text-[#8e9099] mb-0.5">
                       Vai trò
                     </label>
-                    <p className="text-sm font-semibold text-[#1a1b1e]">{user.role}</p>
+                    <p className="text-sm font-semibold text-[#1a1b1e] dark:text-white">
+                      {user.role}
+                    </p>
                   </div>
 
                   <div>
-                    <label className="block text-[11px] font-semibold text-[#74777f] mb-1">
-                      Trạng thái
-                    </label>
-                    <p className="text-sm font-semibold text-[#1a1b1e]">{user.status}</p>
-                  </div>
-
-                  <div>
-                    <label className="block text-[11px] font-semibold text-[#74777f] mb-1">
+                    <label className="block text-[11px] font-semibold text-[#74777f] dark:text-[#8e9099] mb-0.5">
                       Ngày đăng ký
                     </label>
-                    <p className="text-sm font-semibold text-[#1a1b1e]">
-                      {user.joinDate || "01/12/2023"}
+                    <p className="text-sm font-semibold text-[#1a1b1e] dark:text-white">
+                      {user.registerDate || user.joinDate || "01/12/2023"}
                     </p>
                   </div>
                 </div>
+              </div>
+
+              {/* Nhóm 3: Hồ sơ ứng tuyển (CV) */}
+              <div className="pt-1">
+                <h4 className="text-xs font-bold text-[#002046] dark:text-[#87a0cd] uppercase tracking-wider mb-2 pb-1.5 border-b border-[#E2E8F0] dark:border-[#3b3d45] flex items-center gap-1.5">
+                  <span className="material-symbols-outlined text-[17px]">description</span>
+                  <span>Hồ sơ ứng tuyển (CV)</span>
+                </h4>
+
+                {hasCv ? (
+                  <div className="p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/70 dark:bg-[#1a1b1e] flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div
+                        className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 shadow-2xs ${
+                          isPdf
+                            ? "bg-red-50 text-red-600 border border-red-200/80 dark:bg-red-950/50 dark:text-red-300 dark:border-red-900/60"
+                            : "bg-blue-50 text-blue-600 border border-blue-200/80 dark:bg-blue-950/50 dark:text-blue-300 dark:border-blue-900/60"
+                        }`}
+                      >
+                        <span className="material-symbols-outlined text-[20px]">
+                          {isPdf ? "picture_as_pdf" : "description"}
+                        </span>
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p
+                          className="text-xs font-bold text-[#1a1b1e] dark:text-white truncate"
+                          title={cvDisplayName}
+                        >
+                          {cvDisplayName}
+                        </p>
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                          {cvDisplaySize}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Action Buttons: Xem & Thay đổi & Xóa */}
+                    <div className="flex items-center gap-2 shrink-0">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setPreviewDocModal({
+                            fileName: cvDisplayName,
+                            fileSize: cvDisplaySize,
+                            fileUrl: user.cvFile,
+                            isPdf,
+                          })
+                        }
+                        className="px-3 py-1.5 bg-white hover:bg-slate-100 dark:bg-[#25262b] dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
+                        title="Xem trước tài liệu"
+                      >
+                        <span className="material-symbols-outlined text-[16px] text-blue-600">
+                          visibility
+                        </span>
+                        <span>Xem</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => cvFileInputRef.current?.click()}
+                        className="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/40 dark:hover:bg-blue-900/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                        title="Chọn file mới thay thế"
+                      >
+                        <span className="material-symbols-outlined text-[16px]">upload_file</span>
+                        <span>Thay đổi</span>
+                      </button>
+
+                      {user.cvFile && (
+                        <button
+                          type="button"
+                          onClick={handleDeleteCvFile}
+                          className="p-1.5 text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 border border-rose-200 dark:border-rose-900 rounded-lg transition-colors cursor-pointer"
+                          title="Xóa file CV đã tải lên"
+                        >
+                          <span className="material-symbols-outlined text-[16px]">delete</span>
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  <div
+                    onClick={() => cvFileInputRef.current?.click()}
+                    className="rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-700 bg-slate-50/60 dark:bg-[#1a1b1e]/60 hover:bg-blue-50/50 dark:hover:bg-blue-950/20 hover:border-blue-400 transition-all cursor-pointer p-3 text-center group/cv flex items-center justify-center gap-2.5"
+                  >
+                    <div className="w-7 h-7 rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center group-hover/cv:scale-110 transition-transform">
+                      <span className="material-symbols-outlined text-[17px]">upload_file</span>
+                    </div>
+                    <div className="text-left">
+                      <p className="text-xs font-bold text-slate-700 dark:text-slate-200 group-hover/cv:text-blue-600 transition-colors">
+                        Tải file CV lên
+                      </p>
+                      <p className="text-[10px] text-slate-400 dark:text-slate-500">
+                        Định dạng PDF, Word (.pdf, .doc, .docx)
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
